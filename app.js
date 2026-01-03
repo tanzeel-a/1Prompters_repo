@@ -32,6 +32,9 @@ const App = {
   DB_VERSION: 1
 };
 
+// Expose to window for external modules (like auth.js)
+window.App = App;
+
 // ============================================
 // LOCALIZATION STRINGS
 // ============================================
