@@ -2210,43 +2210,14 @@ body.state-login .main-content {
    ============================================ */
 @media (max-width: 768px) {
 
-  /* Sidebar handling */
-  .sidebar {
-    width: 280px;
-    transform: translateX(100%);
-    /* Start hidden to the right */
-    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
-    z-index: var(--z-modal);
-    /* Above content */
-    height: 100vh;
-    top: 0;
+  /* Sidebar Removal (Requested by User) */
+  .sidebar,
+  .sidebar-overlay,
+  #sidebar-toggle {
+    display: none !important;
   }
 
-  .sidebar.sidebar--open {
-    transform: translateX(0);
-    /* Slide in */
-  }
-
-  /* Overlay backing */
-  .sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: var(--z-modal-backdrop);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--transition-normal);
-  }
-
-  .sidebar-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* Main content adjusts */
+  /* Main content adjusts to full width */
   .main-content {
     margin-right: 0;
     max-width: 100%;
@@ -2255,13 +2226,5 @@ body.state-login .main-content {
 
   .footer {
     margin-right: 0;
-  }
-
-  /* Toggle Button visibility */
-  .menu-toggle {
-    display: inline-flex !important;
-    position: relative;
-    z-index: var(--z-modal + 1);
-    /* Above sidebar */
   }
 }

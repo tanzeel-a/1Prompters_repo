@@ -13,20 +13,28 @@
 
 // ============================================
 // APP NAMESPACE
+// Core state management and configuration
 // ============================================
 const App = {
+  // Application State
   state: {
     currentView: 'dashboard',
     questions: [],
     units: [],
-    progress: {},
-    spacedRep: {},
-    settings: { name: 'Student', highContrast: false, reducedMotion: false, sound: true },
+    progress: {},      // User progress map
+    spacedRep: {},     // Spaced repetition data
+    settings: {        // User preferences
+      name: 'Student',
+      highContrast: false,
+      reducedMotion: false,
+      sound: true
+    },
     currentQuestion: null,
     practiceQueue: [],
     teacherAuthenticated: false
   },
 
+  // Constants
   TEACHER_PIN: '1234',
   DB_NAME: 'CLearnDB',
   DB_VERSION: 1
@@ -421,16 +429,15 @@ App.UI = {
     $('[data-action="review-due"]')?.addEventListener('click', () => this.startReview());
 
     // Settings
-    $('#settings-toggle')?.addEventListener('click', () => this.toggleModal('settings-modal'));
+    // Note: Profile button triggers settings modal now
     $('#settings-name')?.addEventListener('change', (e) => this.updateSetting('name', e.target.value));
     $('#settings-high-contrast')?.addEventListener('change', (e) => this.updateSetting('highContrast', e.target.checked));
     $('#settings-reduced-motion')?.addEventListener('change', (e) => this.updateSetting('reducedMotion', e.target.checked));
     $('#reset-progress')?.addEventListener('click', () => this.resetProgress());
 
-    // Sidebar toggle (works on desktop now too)
+    // Sidebar toggle (Desktop Only - Hidden on Mobile)
     $('#sidebar-toggle')?.addEventListener('click', () => {
       document.body.classList.toggle('sidebar-collapsed');
-      $('#sidebar')?.classList.toggle('sidebar--open'); // For mobile specific
     });
 
     // Practice
