@@ -122,3 +122,17 @@ Build a production-quality, responsive, accessible SPA teaching C programming to
   - [ ] Update `App.Storage` to sync with Supabase
   - [ ] Load cloud data on login
   - [ ] Save to cloud on progress update
+
+---
+
+## Phase 13: Refactor & Cleanup
+- [x] Mobile UI Cleanup
+  - [x] Remove Sidebar completely on mobile
+  - [x] Ensure Header Nav is sufficient (or add bottom bar)
+- [x] Code Quality
+  - [x] Deduplicate Settings/Profile logic
+  - [x] Add JSDoc and explanatory comments to `app.js`
+  - [x] Remove dead code (unused components, legacy toggles)
+  - [x] Optimize event binding
+  - [x] Fix High Contrast Text (WCAG AAA Compliance)
+

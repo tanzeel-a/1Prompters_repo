@@ -1987,24 +1987,43 @@ button {
    10. HIGH CONTRAST MODE
    ============================================ */
 .high-contrast {
+  /* STRICT HIGH CONTRAST (WCAG AAA) */
   --color-background: #000000;
-  --color-surface: #1a1a1a;
-  --color-surface-elevated: #2a2a2a;
-  --color-text: #ffffff;
-  --color-text-light: #cccccc;
-  --color-text-lighter: #999999;
-  --color-primary: #ff99b4;
-  --color-primary-light: #ffb3c6;
-  --color-primary-dark: #ff7a9a;
-  --color-secondary: #333333;
-  --color-secondary-light: #444444;
-  --color-secondary-dark: #555555;
+  --color-surface: #000000;
+  --color-surface-elevated: #1a1a1a;
 
-  --shadow-sm: 0 1px 2px rgba(255, 255, 255, 0.1);
-  --shadow-md: 0 2px 4px rgba(255, 255, 255, 0.1);
-  --shadow-lg: 0 4px 8px rgba(255, 255, 255, 0.1);
-  --shadow-clay: 0 4px 8px rgba(255, 255, 255, 0.1);
-  --shadow-inner: inset 0 1px 2px rgba(255, 255, 255, 0.1);
+  --color-text: #ffffff;
+  --color-text-light: #ffff00;
+  /* Yellow for secondary text */
+  --color-text-lighter: #00ffff;
+  /* Cyan for tertiary */
+  --color-text-inverse: #000000;
+  /* Text on primary buttons */
+
+  --color-primary: #ffff00;
+  /* Bright Yellow */
+  --color-primary-light: #ffff00;
+  --color-primary-dark: #ccca00;
+
+  --color-secondary: #ffffff;
+  --color-secondary-light: #ffffff;
+  --color-secondary-dark: #cccccc;
+
+  --color-success: #00ff00;
+  /* Bright Green */
+  --color-error: #ff0000;
+  /* Bright Red */
+  --color-warning: #ff00ff;
+  /* Magenta */
+  --color-info: #00ffff;
+  /* Cyan */
+
+  /* Remove soft shadows, use borders */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: 0 0 0 2px #ffffff;
+  --shadow-clay: 0 0 0 2px #ffffff;
+  --shadow-inner: none;
 }
 
 .high-contrast body::before {
