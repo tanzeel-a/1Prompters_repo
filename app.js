@@ -383,6 +383,12 @@ App.UI = {
     const $ = App.Utils.$;
     const $$ = App.Utils.$$;
 
+    // Auth Actions
+    $('#login-btn')?.addEventListener('click', () => {
+      if (App.Auth) App.Auth.signInWithGoogle();
+      else App.Utils.showToast('Auth not initialized', 'error');
+    });
+
     // Navigation
     $$('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => this.showView(btn.dataset.view));
@@ -998,6 +1004,11 @@ async function initApp() {
 
     // Load questions
     await App.Questions.load();
+
+    // Initialize Auth (if available)
+    if (App.Auth) {
+      App.Auth.init();
+    }
 
     // Initialize UI
     App.UI.init();
