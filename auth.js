@@ -9,7 +9,7 @@
     // we cannot access .env files directly.
     // Please paste your Supabase keys here from your .env file.
     const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_URL_HERE';
-    const SUPABASE_ANON_KEY = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
+    const SUPABASE_ANON_KEY = 'sb_publishable_CTaxwE8zwyQCe1ao_CiGzQ_2sA-nIaA';
 
     // State
     let supabase = null;
