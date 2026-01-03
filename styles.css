@@ -2011,68 +2011,7 @@ h6 {
   }
 }
 
-/* ============================================
-   10. HIGH CONTRAST MODE
-   ============================================ */
-.high-contrast {
-  /* STRICT HIGH CONTRAST (WCAG AAA) */
-  --color-background: #000000;
-  --color-surface: #000000;
-  --color-surface-elevated: #1a1a1a;
-
-  --color-text: #ffffff;
-  --color-text-light: #ffff00;
-  /* Yellow for secondary text */
-  --color-text-lighter: #00ffff;
-  /* Cyan for tertiary */
-  --color-text-inverse: #000000;
-  /* Text on primary buttons */
-
-  --color-primary: #ffff00;
-  /* Bright Yellow */
-  --color-primary-light: #ffff00;
-  --color-primary-dark: #ccca00;
-
-  --color-secondary: #ffffff;
-  --color-secondary-light: #ffffff;
-  --color-secondary-dark: #cccccc;
-
-  --color-success: #00ff00;
-  /* Bright Green */
-  --color-error: #ff0000;
-  /* Bright Red */
-  --color-warning: #ff00ff;
-  /* Magenta */
-  --color-info: #00ffff;
-  /* Cyan */
-
-  /* Remove soft shadows, use borders */
-  --shadow-sm: none;
-  --shadow-md: none;
-  --shadow-lg: 0 0 0 2px #ffffff;
-  --shadow-clay: 0 0 0 2px #ffffff;
-  --shadow-inner: none;
-}
-
-.high-contrast body::before {
-  display: none;
-}
-
-.high-contrast .btn--primary {
-  background: var(--color-primary);
-  color: #000000;
-}
-
-.high-contrast .option-btn {
-  border-width: 2px;
-}
-
-.high-contrast a:focus-visible,
-.high-contrast button:focus-visible,
-.high-contrast .btn:focus-visible {
-  outline: 3px solid var(--color-primary);
-  outline-offset: 3px;
-}
+/* High Contrast Mode Removed */
 
 /* ============================================
    11. REDUCED MOTION

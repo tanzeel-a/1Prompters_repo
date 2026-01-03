@@ -151,5 +151,7 @@ Build a production-quality, responsive, accessible SPA teaching C programming to
 ## Phase 15: Stability & Polish
 - [x] UI Interaction Fixes
   - [x] Fix "Double Tap" on mobile buttons (Hover media query)
+- [x] Feature Cleanup
+  - [x] Remove High Contrast Mode (per user request)
 
 

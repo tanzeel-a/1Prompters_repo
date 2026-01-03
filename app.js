@@ -25,7 +25,7 @@ const App = {
     spacedRep: {},     // Spaced repetition data
     settings: {        // User preferences
       name: 'Student',
-      highContrast: false,
+      // highContrast removed
       reducedMotion: false,
       sound: true
     },
@@ -431,7 +431,7 @@ App.UI = {
     // Settings
     // Note: Profile button triggers settings modal now
     $('#settings-name')?.addEventListener('change', (e) => this.updateSetting('name', e.target.value));
-    $('#settings-high-contrast')?.addEventListener('change', (e) => this.updateSetting('highContrast', e.target.checked));
+    // High contrast removed
     $('#settings-reduced-motion')?.addEventListener('change', (e) => this.updateSetting('reducedMotion', e.target.checked));
     $('#reset-progress')?.addEventListener('click', () => this.resetProgress());
 
