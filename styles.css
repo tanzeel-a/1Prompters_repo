@@ -2114,3 +2114,51 @@ body.sidebar-collapsed .footer {
     max-width: 100%;
   }
 }
+/* Auth Buttons */
+#login-btn {
+  background-color: #fff;
+  color: #757575;
+  border: 1px solid #ddd;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#login-btn:hover {
+  background-color: #f7f7f7;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+#login-btn::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background: url('https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg') no-repeat center center;
+  background-size: contain;
+}
+
+/* Auth Buttons */
+#login-btn {
+  background-color: #fff;
+  color: #757575;
+  border: 1px solid #ddd;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  /* Override default btn styles if needed, but keeping clay style from base class is better */
+  /* Reverting to fit Design System */
+}
+
+#login-btn:hover {
+  background-color: #f7f7f7;
+}
+
+#login-btn::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background: url('https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg') no-repeat center center;
+  background-size: contain;
+}
