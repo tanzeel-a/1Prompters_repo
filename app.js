@@ -1010,25 +1010,32 @@ App.Analytics = {
 // ============================================
 async function initApp() {
   try {
-    // Initialize storage
+    // 1. Initialize storage first (required for everything)
     await App.Storage.init();
 
-    // Load settings
+    // 2. Load settings (theme, etc)
     const savedSettings = await App.Storage.get('settings', 'user');
     if (savedSettings) {
       App.state.settings = { ...App.state.settings, ...savedSettings };
     }
 
-    // Load questions
+    // 3. Load questions (background, don't render yet)
     await App.Questions.load();
 
-    // Initialize Auth (if available)
+    // 4. Initialize Auth Loop
+    // This is the critical gatekeeper.
+    // If Auth exists, let it determine if we show Login or Dashboard.
     if (App.Auth) {
       App.Auth.init();
+      // Auth.init() will trigger `updateUser` which will flip the views.
     }
 
-    // Initialize UI
+    // 5. Check if we are already in a "Logged In" state from local storage before UI Init?
+    // Actually, let's init UI logic (binding events), but NOT render the dashboard view until Auth says so.
+
     App.UI.init();
+    // Note: UI.init calls renderUnits/updateProgress which populates the dashboard,
+    // but the dashboard SECTION should remain hidden via HTML until Auth.updateUser() unhides it.
 
     console.log('Learn C App initialized successfully!');
   } catch (error) {
