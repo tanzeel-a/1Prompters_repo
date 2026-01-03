@@ -432,6 +432,22 @@ App.UI = {
       setTimeout(() => $('#settings-name')?.focus(), 100);
     });
 
+    // Thunder/Turbo Toggle
+    $('#thunder-toggle')?.addEventListener('click', () => {
+      const isTurbo = document.body.classList.toggle('turbo-mode');
+      const container = App.Utils.$('#toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast--info`;
+      toast.textContent = isTurbo ? '⚡ Turbo Mode Activated!' : 'Turbo Mode Deactivated';
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+
+      if (isTurbo) {
+        document.body.style.animation = 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both';
+        setTimeout(() => document.body.style.animation = '', 500);
+      }
+    });
+
     // Contrast toggle
     $('#toggle-contrast')?.addEventListener('click', () => {
       const current = App.state.settings.highContrast;
