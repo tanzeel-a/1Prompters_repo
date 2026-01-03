@@ -74,8 +74,16 @@
 
         if (currentUser) {
             // LOGGED IN: Show Dashboard
-            if (viewLogin) viewLogin.hidden = true;
-            if (viewDashboard) viewDashboard.hidden = false;
+            if (viewLogin) {
+                viewLogin.hidden = true;
+                viewLogin.classList.remove('view--active');
+                viewLogin.style.display = 'none'; // Force hide
+            }
+            if (viewDashboard) {
+                viewDashboard.hidden = false;
+                viewDashboard.classList.add('view--active');
+                viewDashboard.style.display = ''; // Restore default
+            }
             document.body.classList.remove('state-login');
 
             if (profileBtn) profileBtn.style.display = 'inline-flex';
@@ -90,8 +98,16 @@
             }
         } else {
             // LOGGED OUT: Show Login (Gatekeeper)
-            if (viewLogin) viewLogin.hidden = false;
-            if (viewDashboard) viewDashboard.hidden = true;
+            if (viewLogin) {
+                viewLogin.hidden = false;
+                viewLogin.classList.add('view--active');
+                viewLogin.style.display = ''; // Restore default
+            }
+            if (viewDashboard) {
+                viewDashboard.hidden = true;
+                viewDashboard.classList.remove('view--active');
+                viewDashboard.style.display = 'none'; // Force hide
+            }
             document.body.classList.add('state-login');
 
             if (profileBtn) profileBtn.style.display = 'none';
