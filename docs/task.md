@@ -136,3 +136,20 @@ Build a production-quality, responsive, accessible SPA teaching C programming to
   - [x] Optimize event binding
   - [x] Fix High Contrast Text (WCAG AAA Compliance)
 
+---
+
+## Phase 14: Visual Refinements
+- [x] Typography Update
+  - [x] Add Google Fonts (Formal + Handwriting style)
+  - [x] Apply "Handwriting" font to Headings/Accents
+  - [x] Apply "Formal" font to Body text
+- [x] Branding
+  - [x] Generate and link `favicon.png` (Simple "C" logo)
+
+---
+
+## Phase 15: Stability & Polish
+- [x] UI Interaction Fixes
+  - [x] Fix "Double Tap" on mobile buttons (Hover media query)
+
+

@@ -370,9 +370,11 @@ button {
   background: transparent;
 }
 
-.nav-btn:hover {
-  background: var(--color-secondary);
-  color: var(--color-text);
+@media (hover: hover) {
+  .nav-btn:hover {
+    background: var(--color-secondary);
+    color: var(--color-text);
+  }
 }
 
 .nav-btn:focus-visible {
@@ -612,8 +614,10 @@ button {
   box-shadow: var(--shadow-clay);
 }
 
-.btn:hover {
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .btn:hover {
+    transform: translateY(-1px);
+  }
 }
 
 .btn:active {
@@ -1217,9 +1221,17 @@ h6 {
   box-shadow: var(--shadow-sm);
 }
 
-.option-btn:hover:not(:disabled) {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
+/* Fix double-tap on mobile by only applying hover on supported devices */
+@media (hover: hover) {
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+    cursor: pointer;
+  }
+}
+
+.option-btn:active {
+  transform: scale(0.98);
 }
 
 .option-btn:focus-visible {
