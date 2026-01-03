@@ -1934,3 +1934,63 @@ button {
 .reduced-motion .parallax-bg {
   display: none;
 }
+
+/* Sidebar collapsed state (desktop) */
+body.sidebar-collapsed .sidebar {
+  width: 80px;
+}
+
+body.sidebar-collapsed .sidebar__heading,
+body.sidebar-collapsed .sidebar__profile-info,
+body.sidebar-collapsed .sidebar__profile-level,
+body.sidebar-collapsed .progress-ring__text,
+body.sidebar-collapsed .goals-card__label,
+body.sidebar-collapsed .unit-list__name,
+body.sidebar-collapsed .unit-list__progress,
+body.sidebar-collapsed .goals-card {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+body.sidebar-collapsed .sidebar__profile {
+  justify-content: center;
+  margin-bottom: var(--spacing-md);
+}
+
+body.sidebar-collapsed .sidebar__content {
+  padding: var(--spacing-md);
+}
+
+body.sidebar-collapsed .progress-ring__bg,
+body.sidebar-collapsed .progress-ring__bar {
+  stroke-width: 8;
+  r: 40; /* Resize ring */
+}
+body.sidebar-collapsed .progress-ring svg {
+  width: 80px; 
+  height: 80px;
+}
+
+body.sidebar-collapsed .unit-list__item {
+  justify-content: center;
+  padding: var(--spacing-md) 0;
+}
+
+body.sidebar-collapsed .main-content,
+body.sidebar-collapsed .footer {
+  margin-left: 80px;
+  max-width: calc(100% - 80px);
+}
+
+/* Ensure mobile behavior remains: sidebar totally hidden or full width */
+@media (max-width: 768px) {
+  body.sidebar-collapsed .sidebar {
+    width: 280px; /* Reset to full width for mobile overlay */
+  }
+  body.sidebar-collapsed .main-content,
+  body.sidebar-collapsed .footer {
+    margin-left: 0;
+    max-width: 100%;
+  }
+}

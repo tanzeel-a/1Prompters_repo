@@ -26,7 +26,7 @@ const App = {
     practiceQueue: [],
     teacherAuthenticated: false
   },
-  
+
   TEACHER_PIN: '1234',
   DB_NAME: 'CLearnDB',
   DB_VERSION: 1
@@ -62,14 +62,14 @@ App.Utils = {
     div.textContent = str;
     return div.innerHTML;
   },
-  
+
   // Format time in minutes/hours
   formatTime(seconds) {
     if (seconds < 60) return `${seconds}s`;
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
     return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
   },
-  
+
   // Debounce function
   debounce(fn, delay) {
     let timeout;
@@ -78,12 +78,12 @@ App.Utils = {
       timeout = setTimeout(() => fn.apply(this, args), delay);
     };
   },
-  
+
   // Generate unique ID
   generateId() {
     return 'id_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
   },
-  
+
   // Shuffle array
   shuffle(array) {
     const arr = [...array];
@@ -93,12 +93,12 @@ App.Utils = {
     }
     return arr;
   },
-  
+
   // Get element safely
   $(selector) {
     return document.querySelector(selector);
   },
-  
+
   // Get all elements
   $$(selector) {
     return document.querySelectorAll(selector);
@@ -111,28 +111,28 @@ App.Utils = {
 App.Storage = {
   db: null,
   useIndexedDB: true,
-  
+
   async init() {
     if (!window.indexedDB) {
       this.useIndexedDB = false;
       console.log('IndexedDB not available, using localStorage');
       return;
     }
-    
+
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(App.DB_NAME, App.DB_VERSION);
-      
+
       request.onerror = () => {
         console.warn('IndexedDB error, falling back to localStorage');
         this.useIndexedDB = false;
         resolve();
       };
-      
+
       request.onsuccess = (e) => {
         this.db = e.target.result;
         resolve();
       };
-      
+
       request.onupgradeneeded = (e) => {
         const db = e.target.result;
         if (!db.objectStoreNames.contains('progress')) {
@@ -150,13 +150,13 @@ App.Storage = {
       };
     });
   },
-  
+
   async get(store, key) {
     if (!this.useIndexedDB) {
       const data = localStorage.getItem(`${App.DB_NAME}_${store}_${key}`);
       return data ? JSON.parse(data) : null;
     }
-    
+
     return new Promise((resolve) => {
       const tx = this.db.transaction(store, 'readonly');
       const request = tx.objectStore(store).get(key);
@@ -164,14 +164,14 @@ App.Storage = {
       request.onerror = () => resolve(null);
     });
   },
-  
+
   async set(store, data) {
     if (!this.useIndexedDB) {
       const key = data.questionId || data.key || data.id;
       localStorage.setItem(`${App.DB_NAME}_${store}_${key}`, JSON.stringify(data));
       return;
     }
-    
+
     return new Promise((resolve, reject) => {
       const tx = this.db.transaction(store, 'readwrite');
       tx.objectStore(store).put(data);
@@ -179,7 +179,7 @@ App.Storage = {
       tx.onerror = () => reject(tx.error);
     });
   },
-  
+
   async getAll(store) {
     if (!this.useIndexedDB) {
       const prefix = `${App.DB_NAME}_${store}_`;
@@ -192,7 +192,7 @@ App.Storage = {
       }
       return results;
     }
-    
+
     return new Promise((resolve) => {
       const tx = this.db.transaction(store, 'readonly');
       const request = tx.objectStore(store).getAll();
@@ -200,7 +200,7 @@ App.Storage = {
       request.onerror = () => resolve([]);
     });
   },
-  
+
   async clear(store) {
     if (!this.useIndexedDB) {
       const prefix = `${App.DB_NAME}_${store}_`;
@@ -212,21 +212,21 @@ App.Storage = {
       keysToRemove.forEach(k => localStorage.removeItem(k));
       return;
     }
-    
+
     return new Promise((resolve) => {
       const tx = this.db.transaction(store, 'readwrite');
       tx.objectStore(store).clear();
       tx.oncomplete = () => resolve();
     });
   },
-  
+
   async exportAll() {
     const progress = await this.getAll('progress');
     const spacedRep = await this.getAll('spacedRep');
     const settings = await this.getAll('settings');
     return { progress, spacedRep, settings, exportDate: new Date().toISOString() };
   },
-  
+
   async importAll(data) {
     if (data.progress) {
       for (const item of data.progress) await this.set('progress', item);
@@ -246,12 +246,12 @@ App.Storage = {
 App.SpacedRep = {
   DEFAULT_EASE: 2.5,
   MIN_EASE: 1.3,
-  
+
   // Calculate next review based on SM-2
   calculate(current, grade) {
     // grade: 0-5 (0-2 = fail, 3-5 = pass)
     let { easeFactor = this.DEFAULT_EASE, interval = 1, repetitions = 0 } = current || {};
-    
+
     if (grade < 3) {
       // Failed - reset
       repetitions = 0;
@@ -267,24 +267,24 @@ App.SpacedRep = {
       }
       repetitions++;
     }
-    
+
     // Update ease factor
     easeFactor = easeFactor + (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02));
     if (easeFactor < this.MIN_EASE) easeFactor = this.MIN_EASE;
-    
+
     const nextReview = new Date();
     nextReview.setDate(nextReview.getDate() + interval);
-    
+
     return { easeFactor, interval, repetitions, nextReview: nextReview.toISOString(), lastGrade: grade };
   },
-  
+
   // Get questions due for review
   async getDueQuestions() {
     const allRep = await App.Storage.getAll('spacedRep');
     const now = new Date();
     return allRep.filter(item => new Date(item.nextReview) <= now).map(item => item.questionId);
   },
-  
+
   // Update a question's spaced rep data
   async update(questionId, grade) {
     const current = await App.Storage.get('spacedRep', questionId);
@@ -312,15 +312,15 @@ App.Questions = {
       App.UI.showToast('Failed to load questions', 'error');
     }
   },
-  
+
   getById(id) {
     return App.state.questions.find(q => q.id === id);
   },
-  
+
   getByUnit(unitId) {
     return App.state.questions.filter(q => q.unit === unitId);
   },
-  
+
   filter({ unit, difficulty, type }) {
     return App.state.questions.filter(q => {
       if (unit && unit !== 'all' && q.unit !== parseInt(unit)) return false;
@@ -329,7 +329,7 @@ App.Questions = {
       return true;
     });
   },
-  
+
   getNextInJourney() {
     const progress = App.state.progress;
     // Find first unanswered question in order
@@ -340,7 +340,7 @@ App.Questions = {
     }
     return null; // All complete
   },
-  
+
   // Validate code answer (static pattern matching)
   validateCode(userCode, testCases) {
     const results = [];
@@ -353,7 +353,7 @@ App.Questions = {
     }
     return results;
   },
-  
+
   checkCodeOutput(code, testCase) {
     // Static validation - check for expected patterns
     if (testCase.type === 'contains') {
@@ -378,95 +378,116 @@ App.UI = {
     this.updateProgress();
     this.applySettings();
   },
-  
+
   bindEvents() {
     const $ = App.Utils.$;
     const $$ = App.Utils.$$;
-    
+
     // Navigation
     $$('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => this.showView(btn.dataset.view));
     });
-    
+
     // Dashboard actions
     $('[data-action="continue-journey"]')?.addEventListener('click', () => {
       this.showView('journey');
       this.loadNextQuestion();
     });
-    
+
     $('[data-action="start-practice"]')?.addEventListener('click', () => this.showView('practice'));
     $('[data-action="review-due"]')?.addEventListener('click', () => this.startReview());
-    
+
     // Settings
     $('#settings-toggle')?.addEventListener('click', () => this.toggleModal('settings-modal'));
     $('#settings-name')?.addEventListener('change', (e) => this.updateSetting('name', e.target.value));
     $('#settings-high-contrast')?.addEventListener('change', (e) => this.updateSetting('highContrast', e.target.checked));
     $('#settings-reduced-motion')?.addEventListener('change', (e) => this.updateSetting('reducedMotion', e.target.checked));
     $('#reset-progress')?.addEventListener('click', () => this.resetProgress());
-    
-    // Sidebar toggle
+
+    // Sidebar toggle (works on desktop now too)
     $('#sidebar-toggle')?.addEventListener('click', () => {
-      $('#sidebar')?.classList.toggle('sidebar--open');
+      document.body.classList.toggle('sidebar-collapsed');
+      $('#sidebar')?.classList.toggle('sidebar--open'); // For mobile specific
     });
-    
+
     // Practice
     $('#start-practice')?.addEventListener('click', () => this.startPractice());
-    
+
     // Teacher mode
     $('#teacher-mode-link')?.addEventListener('click', () => this.showView('teacher'));
     $('#teacher-login-btn')?.addEventListener('click', () => this.authenticateTeacher());
-    
+    $('#exit-teacher-mode')?.addEventListener('click', () => {
+      App.state.teacherAuthenticated = false;
+      App.Utils.$('#teacher-login').hidden = false;
+      App.Utils.$('#teacher-dashboard').hidden = true;
+      App.Utils.$('#exit-teacher-mode').hidden = true;
+      this.showView('dashboard');
+      this.showToast('Returned to Student Mode', 'info');
+    });
+
+    // Profile Button (Stub)
+    $('#profile-btn')?.addEventListener('click', () => {
+      // Just reuse settings name input for now as a simple profile edit
+      this.toggleModal('settings-modal');
+      setTimeout(() => $('#settings-name')?.focus(), 100);
+    });
+
     // Contrast toggle
     $('#toggle-contrast')?.addEventListener('click', () => {
       const current = App.state.settings.highContrast;
       this.updateSetting('highContrast', !current);
     });
-    
+
     // Export/Import
     $('#export-progress')?.addEventListener('click', () => this.exportProgress());
     $('#import-progress')?.addEventListener('click', () => $('#import-file').click());
     $('#import-file')?.addEventListener('change', (e) => this.importProgress(e));
-    
+
     // Modal close
     $$('[data-close-modal]').forEach(el => {
       el.addEventListener('click', () => this.closeAllModals());
     });
-    
+
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') this.closeAllModals();
     });
   },
-  
+
   showView(viewId) {
     const $ = App.Utils.$;
     const $$ = App.Utils.$$;
-    
+
+    // Sidebar auto-collapse on mobile when navigating
+    if (window.innerWidth <= 768) {
+      $('#sidebar')?.classList.remove('sidebar--open');
+    }
+
     // Update nav
     $$('.nav-btn').forEach(btn => {
       btn.classList.toggle('nav-btn--active', btn.dataset.view === viewId);
       btn.setAttribute('aria-current', btn.dataset.view === viewId ? 'page' : 'false');
     });
-    
+
     // Show view
     $$('.view').forEach(view => {
       view.classList.remove('view--active');
       view.hidden = true;
     });
-    
+
     const activeView = $(`#view-${viewId}`);
     if (activeView) {
       activeView.classList.add('view--active');
       activeView.hidden = false;
     }
-    
+
     App.state.currentView = viewId;
-    
+
     // View-specific init
     if (viewId === 'journey') this.loadNextQuestion();
     if (viewId === 'progress') this.renderProgressDashboard();
   },
-  
+
   toggleModal(modalId) {
     const modal = App.Utils.$(`#${modalId}`);
     if (modal) {
@@ -477,11 +498,11 @@ App.UI = {
       }
     }
   },
-  
+
   closeAllModals() {
     App.Utils.$$('.modal').forEach(m => m.hidden = true);
   },
-  
+
   showToast(message, type = 'info') {
     const container = App.Utils.$('#toast-container');
     const toast = document.createElement('div');
@@ -494,11 +515,11 @@ App.UI = {
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 4000);
   },
-  
+
   renderUnits() {
     const list = App.Utils.$('#unit-list');
     if (!list) return;
-    
+
     list.innerHTML = App.state.units.map(unit => `
       <li class="unit-list__item" data-unit="${unit.id}">
         <svg class="unit-list__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -508,62 +529,62 @@ App.UI = {
         <span class="unit-list__progress">0%</span>
       </li>
     `).join('');
-    
+
     // Unit selector for practice
     const select = App.Utils.$('#practice-unit');
     if (select) {
-      select.innerHTML = '<option value="all">All Units</option>' + 
+      select.innerHTML = '<option value="all">All Units</option>' +
         App.state.units.map(u => `<option value="${u.id}">${App.Utils.sanitizeHTML(u.name)}</option>`).join('');
     }
   },
-  
+
   async updateProgress() {
     const progress = await App.Storage.getAll('progress');
     App.state.progress = {};
     progress.forEach(p => App.state.progress[p.questionId] = p);
-    
+
     const total = App.state.questions.length;
     const completed = progress.filter(p => p.completed).length;
     const correct = progress.filter(p => p.correct).length;
     const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
-    
+
     // Update UI
     const $ = App.Utils.$;
     $('#progress-percent').textContent = `${percent}%`;
     $('#stat-total-answered').textContent = completed;
     $('#stat-accuracy').textContent = completed > 0 ? `${Math.round((correct / completed) * 100)}%` : '0%';
-    
+
     // Update progress ring
     const circle = $('#progress-circle');
     if (circle) {
       const circumference = 2 * Math.PI * 52;
       circle.style.strokeDashoffset = circumference - (percent / 100) * circumference;
     }
-    
+
     // Review count
     const dueCount = (await App.SpacedRep.getDueQuestions()).length;
     $('#review-count').textContent = dueCount;
   },
-  
+
   applySettings() {
     const { highContrast, reducedMotion, name } = App.state.settings;
     document.documentElement.classList.toggle('high-contrast', highContrast);
     document.documentElement.classList.toggle('reduced-motion', reducedMotion);
-    
+
     const $ = App.Utils.$;
     $('#user-name').textContent = name || 'Student';
     $('#settings-name').value = name || '';
     $('#settings-high-contrast').checked = highContrast;
     $('#settings-reduced-motion').checked = reducedMotion;
   },
-  
+
   async updateSetting(key, value) {
     App.state.settings[key] = value;
     await App.Storage.set('settings', { key: 'user', ...App.state.settings });
     this.applySettings();
-    this.showToast('Settings saved!', 'success');
+    // this.showToast('Settings saved!', 'success'); // Disabled per user request
   },
-  
+
   async loadNextQuestion() {
     const question = App.Questions.getNextInJourney();
     if (question) {
@@ -578,18 +599,18 @@ App.UI = {
       `;
     }
   },
-  
+
   renderQuestion(question, containerSelector) {
     const container = App.Utils.$(containerSelector);
     if (!container || !question) return;
-    
+
     const difficultyClass = `question-card__tag--difficulty-${question.difficulty}`;
     const typeLabel = App.Strings.questionTypes[question.type] || question.type;
     const diffLabel = App.Strings.difficulties[question.difficulty] || '';
-    
+
     let optionsHTML = '';
     let inputHTML = '';
-    
+
     if (question.type === 'mcq' || question.type === 'tf') {
       optionsHTML = `
         <div class="options-list">
@@ -618,7 +639,7 @@ App.UI = {
         <div class="test-results" id="test-results" hidden></div>
       `;
     }
-    
+
     container.innerHTML = `
       <div class="question-card" data-question-id="${question.id}">
         <div class="question-card__header">
@@ -648,11 +669,11 @@ App.UI = {
         </div>
       </div>
     `;
-    
+
     // Bind question events
     this.bindQuestionEvents(question);
   },
-  
+
   formatQuestionBody(body) {
     // Handle code blocks
     let formatted = body.replace(/```c?\n?([\s\S]*?)```/g, '<pre>$1</pre>');
@@ -660,13 +681,13 @@ App.UI = {
     formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
     return formatted;
   },
-  
+
   bindQuestionEvents(question) {
     const $ = App.Utils.$;
     const $$ = App.Utils.$$;
     let selectedOption = null;
     let hintsUsed = 0;
-    
+
     // Option selection
     $$('.option-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -675,15 +696,15 @@ App.UI = {
         selectedOption = parseInt(btn.dataset.index);
       });
     });
-    
+
     // Submit
     $('#submit-btn')?.addEventListener('click', async () => {
       let answer, isCorrect = false;
-      
+
       if (question.type === 'mcq' || question.type === 'tf') {
         answer = selectedOption;
         isCorrect = answer === question.correctAnswer;
-        
+
         // Show correct/incorrect on options
         $$('.option-btn').forEach((btn, i) => {
           if (i === question.correctAnswer) btn.classList.add('option-btn--correct');
@@ -699,7 +720,7 @@ App.UI = {
         isCorrect = results.every(r => r.passed);
         this.showTestResults(results);
       }
-      
+
       // Show feedback
       const feedback = $('#feedback');
       feedback.hidden = false;
@@ -708,26 +729,26 @@ App.UI = {
         <div class="feedback__title">${isCorrect ? '✓ Correct!' : '✗ Not quite right'}</div>
         <p class="feedback__explanation">${App.Utils.sanitizeHTML(question.explanation || '')}</p>
       `;
-      
+
       // Calculate points (reduce for hints used)
       const maxPoints = question.points || 10;
       const earnedPoints = isCorrect ? Math.max(maxPoints - (hintsUsed * 3), 1) : 0;
-      
+
       // Save progress
       await this.saveQuestionProgress(question.id, isCorrect, earnedPoints, hintsUsed);
-      
+
       // Update spaced rep
       const grade = isCorrect ? (hintsUsed === 0 ? 5 : 4) : 2;
       await App.SpacedRep.update(question.id, grade);
-      
+
       // Update button
       $('#submit-btn').textContent = 'Next Question';
       $('#submit-btn').onclick = () => this.loadNextQuestion();
     });
-    
+
     // Skip
     $('#skip-btn')?.addEventListener('click', () => this.loadNextQuestion());
-    
+
     // Hint
     $('#hint-btn')?.addEventListener('click', () => {
       if (question.hints && hintsUsed < question.hints.length) {
@@ -746,12 +767,12 @@ App.UI = {
       }
     });
   },
-  
+
   showTestResults(results) {
     const container = App.Utils.$('#test-results');
     if (!container) return;
     container.hidden = false;
-    
+
     const passed = results.filter(r => r.passed).length;
     container.innerHTML = `
       <div class="test-results__header">
@@ -766,7 +787,7 @@ App.UI = {
       `).join('')}
     `;
   },
-  
+
   async saveQuestionProgress(questionId, correct, points, hintsUsed) {
     const existing = App.state.progress[questionId] || { questionId, attempts: 0 };
     const progress = {
@@ -781,35 +802,35 @@ App.UI = {
     await App.Storage.set('progress', progress);
     App.state.progress[questionId] = progress;
     this.updateProgress();
-    this.showToast('Progress saved!', 'success');
+    // this.showToast('Progress saved!', 'success'); // Disabled per user request
   },
-  
+
   startPractice() {
     const unit = App.Utils.$('#practice-unit')?.value;
     const difficulty = App.Utils.$('#practice-difficulty')?.value;
     const type = App.Utils.$('#practice-type')?.value;
-    
+
     const questions = App.Questions.filter({ unit, difficulty, type });
     if (questions.length === 0) {
       this.showToast('No questions match your filters', 'info');
       return;
     }
-    
+
     App.state.practiceQueue = App.Utils.shuffle(questions);
     App.state.currentQuestion = App.state.practiceQueue.shift();
-    
+
     const container = App.Utils.$('#practice-question-container');
     container.hidden = false;
     this.renderQuestion(App.state.currentQuestion, '#practice-question-container');
   },
-  
+
   async startReview() {
     const dueIds = await App.SpacedRep.getDueQuestions();
     if (dueIds.length === 0) {
       this.showToast('No reviews due!', 'info');
       return;
     }
-    
+
     const questions = dueIds.map(id => App.Questions.getById(id)).filter(Boolean);
     App.state.practiceQueue = App.Utils.shuffle(questions);
     this.showView('practice');
@@ -817,7 +838,7 @@ App.UI = {
     this.renderQuestion(App.state.currentQuestion, '#practice-question-container');
     App.Utils.$('#practice-question-container').hidden = false;
   },
-  
+
   renderProgressDashboard() {
     // Unit progress grid
     const grid = App.Utils.$('#unit-progress-grid');
@@ -837,7 +858,7 @@ App.UI = {
         `;
       }).join('');
     }
-    
+
     // Simple chart (bar chart using SVG)
     const chart = App.Utils.$('#progress-chart');
     if (chart && App.state.units.length > 0) {
@@ -846,20 +867,20 @@ App.UI = {
         <svg width="100%" height="250" viewBox="0 0 400 250">
           <text x="200" y="20" text-anchor="middle" fill="var(--color-text)" font-size="14" font-weight="600">Progress by Unit</text>
           ${App.state.units.slice(0, 8).map((unit, i) => {
-            const questions = App.Questions.getByUnit(unit.id);
-            const completed = questions.filter(q => App.state.progress[q.id]?.completed).length;
-            const height = (completed / maxQuestions) * 150;
-            const x = 30 + i * 45;
-            return `
+        const questions = App.Questions.getByUnit(unit.id);
+        const completed = questions.filter(q => App.state.progress[q.id]?.completed).length;
+        const height = (completed / maxQuestions) * 150;
+        const x = 30 + i * 45;
+        return `
               <rect x="${x}" y="${200 - height}" width="35" height="${height}" fill="var(--color-primary)" rx="4"/>
               <text x="${x + 17}" y="220" text-anchor="middle" fill="var(--color-text-light)" font-size="10">U${unit.id}</text>
             `;
-          }).join('')}
+      }).join('')}
         </svg>
       `;
     }
   },
-  
+
   authenticateTeacher() {
     const pin = App.Utils.$('#teacher-pin')?.value;
     if (pin === App.TEACHER_PIN) {
@@ -872,7 +893,7 @@ App.UI = {
       this.showToast(App.Strings.invalidPin, 'error');
     }
   },
-  
+
   renderTeacherDashboard() {
     const list = App.Utils.$('#question-list');
     if (list) {
@@ -887,7 +908,7 @@ App.UI = {
         </div>
       `).join('');
     }
-    
+
     // Stats
     const stats = App.Utils.$('#teacher-stats');
     const progress = Object.values(App.state.progress);
@@ -908,7 +929,7 @@ App.UI = {
       `;
     }
   },
-  
+
   async exportProgress() {
     const data = await App.Storage.exportAll();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -920,11 +941,11 @@ App.UI = {
     URL.revokeObjectURL(url);
     this.showToast(App.Strings.exportSuccess, 'success');
   },
-  
+
   async importProgress(event) {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     try {
       const text = await file.text();
       const data = JSON.parse(text);
@@ -935,7 +956,7 @@ App.UI = {
       this.showToast('Failed to import: Invalid file', 'error');
     }
   },
-  
+
   async resetProgress() {
     if (!confirm(App.Strings.resetConfirm)) return;
     await App.Storage.clear('progress');
@@ -966,19 +987,19 @@ async function initApp() {
   try {
     // Initialize storage
     await App.Storage.init();
-    
+
     // Load settings
     const savedSettings = await App.Storage.get('settings', 'user');
     if (savedSettings) {
       App.state.settings = { ...App.state.settings, ...savedSettings };
     }
-    
+
     // Load questions
     await App.Questions.load();
-    
+
     // Initialize UI
     App.UI.init();
-    
+
     console.log('Learn C App initialized successfully!');
   } catch (error) {
     console.error('Failed to initialize app:', error);

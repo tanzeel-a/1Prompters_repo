@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Learn C Programming - An interactive learning app for Class 10 UP Board students">
   <meta name="theme-color" content="#e8a4b8">
   <title>Learn C Programming | Class 10 UP Board</title>
-  
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+    rel="stylesheet">
+
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <!-- Skip to main content link for accessibility -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
-  
+
   <!-- ============================================
        HEADER - Navigation and Settings
        ============================================ -->
@@ -27,57 +31,71 @@
       <!-- Logo -->
       <div class="header__logo">
         <svg class="header__logo-icon" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-          <circle cx="20" cy="20" r="18" fill="var(--color-primary)" opacity="0.3"/>
-          <text x="20" y="26" text-anchor="middle" fill="var(--color-primary-dark)" font-size="18" font-weight="700">C</text>
+          <circle cx="20" cy="20" r="18" fill="var(--color-primary)" opacity="0.3" />
+          <text x="20" y="26" text-anchor="middle" fill="var(--color-primary-dark)" font-size="18"
+            font-weight="700">C</text>
         </svg>
         <span class="header__logo-text">Learn C</span>
       </div>
-      
+
       <!-- Navigation -->
       <nav class="header__nav" role="navigation" aria-label="Main navigation">
         <button class="nav-btn nav-btn--active" data-view="dashboard" aria-current="page">
-          <svg class="nav-btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-            <polyline points="9,22 9,12 15,12 15,22"/>
+          <svg class="nav-btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            <polyline points="9,22 9,12 15,12 15,22" />
           </svg>
           <span>Home</span>
         </button>
         <button class="nav-btn" data-view="journey">
-          <svg class="nav-btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12,6 12,12 16,14"/>
+          <svg class="nav-btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12,6 12,12 16,14" />
           </svg>
           <span>Journey</span>
         </button>
         <button class="nav-btn" data-view="practice">
-          <svg class="nav-btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+          <svg class="nav-btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path
+              d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" />
           </svg>
           <span>Practice</span>
         </button>
         <button class="nav-btn" data-view="progress">
-          <svg class="nav-btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="20" x2="18" y2="10"/>
-            <line x1="12" y1="20" x2="12" y2="4"/>
-            <line x1="6" y1="20" x2="6" y2="14"/>
+          <svg class="nav-btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10" />
+            <line x1="12" y1="20" x2="12" y2="4" />
+            <line x1="6" y1="20" x2="6" y2="14" />
           </svg>
           <span>Progress</span>
         </button>
       </nav>
-      
-      <!-- Settings Toggle -->
+
+      <!-- Settings & Profile -->
       <div class="header__actions">
-        <button class="btn-icon" id="settings-toggle" aria-label="Open settings" aria-expanded="false">
+        <button class="btn-icon" id="profile-btn" aria-label="User Profile" aria-expanded="false" title="User Profile">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
           </svg>
         </button>
-        <button class="btn-icon btn-icon--mobile" id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">
+        <button class="btn-icon" id="settings-toggle" aria-label="Open settings" aria-expanded="false" title="Settings">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+          </svg>
+        </button>
+        <button class="btn-icon" id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false"
+          title="Toggle Sidebar">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
         </button>
       </div>
@@ -88,7 +106,7 @@
        MAIN LAYOUT - Sidebar + Content
        ============================================ -->
   <div class="app-layout">
-    
+
     <!-- Sidebar - Progress Overview -->
     <aside class="sidebar" id="sidebar" role="complementary" aria-label="Progress sidebar">
       <div class="sidebar__content">
@@ -96,9 +114,9 @@
         <div class="sidebar__profile">
           <div class="avatar" aria-hidden="true">
             <svg width="48" height="48" viewBox="0 0 48 48">
-              <circle cx="24" cy="24" r="22" fill="var(--color-primary)" opacity="0.2"/>
-              <circle cx="24" cy="18" r="8" fill="var(--color-primary)"/>
-              <path d="M8 42c0-10 7-16 16-16s16 6 16 16" fill="var(--color-primary)"/>
+              <circle cx="24" cy="24" r="22" fill="var(--color-primary)" opacity="0.2" />
+              <circle cx="24" cy="18" r="8" fill="var(--color-primary)" />
+              <path d="M8 42c0-10 7-16 16-16s16 6 16 16" fill="var(--color-primary)" />
             </svg>
           </div>
           <div class="sidebar__profile-info">
@@ -106,14 +124,17 @@
             <span class="sidebar__profile-level">Level <span id="user-level">1</span></span>
           </div>
         </div>
-        
+
         <!-- Overall Progress -->
         <div class="sidebar__section">
           <h2 class="sidebar__heading">Your Progress</h2>
           <div class="progress-ring" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
             <svg width="120" height="120" viewBox="0 0 120 120">
-              <circle class="progress-ring__bg" cx="60" cy="60" r="52" fill="none" stroke="var(--color-secondary)" stroke-width="12"/>
-              <circle class="progress-ring__bar" id="progress-circle" cx="60" cy="60" r="52" fill="none" stroke="var(--color-primary)" stroke-width="12" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73" transform="rotate(-90 60 60)"/>
+              <circle class="progress-ring__bg" cx="60" cy="60" r="52" fill="none" stroke="var(--color-secondary)"
+                stroke-width="12" />
+              <circle class="progress-ring__bar" id="progress-circle" cx="60" cy="60" r="52" fill="none"
+                stroke="var(--color-primary)" stroke-width="12" stroke-linecap="round" stroke-dasharray="326.73"
+                stroke-dashoffset="326.73" transform="rotate(-90 60 60)" />
             </svg>
             <div class="progress-ring__text">
               <span class="progress-ring__percent" id="progress-percent">0%</span>
@@ -121,7 +142,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Unit List -->
         <div class="sidebar__section">
           <h2 class="sidebar__heading">Units</h2>
@@ -129,7 +150,7 @@
             <!-- Dynamically populated -->
           </ul>
         </div>
-        
+
         <!-- Today's Goals -->
         <div class="sidebar__section">
           <h2 class="sidebar__heading">Today's Goals</h2>
@@ -149,22 +170,23 @@
 
     <!-- Main Content Area -->
     <main class="main-content" id="main-content" role="main">
-      
+
       <!-- ============================================
            VIEW: Dashboard (Home)
            ============================================ -->
       <section class="view view--active" id="view-dashboard" aria-labelledby="dashboard-title">
         <div class="view__header">
           <h1 class="view__title" id="dashboard-title">Welcome to Learn C!</h1>
-          <p class="view__subtitle">Your journey to becoming a C programmer starts here. Let's learn together, step by step.</p>
+          <p class="view__subtitle">Your journey to becoming a C programmer starts here. Let's learn together, step by
+            step.</p>
         </div>
-        
+
         <!-- Quick Actions -->
         <div class="dashboard__actions">
           <button class="action-card action-card--primary" data-action="continue-journey">
             <div class="action-card__icon">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="5,3 19,12 5,21"/>
+                <polygon points="5,3 19,12 5,21" />
               </svg>
             </div>
             <div class="action-card__content">
@@ -172,11 +194,12 @@
               <p class="action-card__desc">Pick up where you left off</p>
             </div>
           </button>
-          
+
           <button class="action-card" data-action="start-practice">
             <div class="action-card__icon">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                <path
+                  d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" />
               </svg>
             </div>
             <div class="action-card__content">
@@ -184,12 +207,12 @@
               <p class="action-card__desc">Choose topics to practice</p>
             </div>
           </button>
-          
+
           <button class="action-card" data-action="review-due">
             <div class="action-card__icon">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 8v4l3 3"/>
-                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4l3 3" />
+                <circle cx="12" cy="12" r="10" />
               </svg>
             </div>
             <div class="action-card__content">
@@ -198,21 +221,22 @@
             </div>
           </button>
         </div>
-        
+
         <!-- Recent Achievements -->
         <div class="dashboard__section">
           <h2 class="section-title">Recent Achievements</h2>
           <div class="badges-grid" id="recent-badges">
             <div class="badge-placeholder">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-light)" stroke-width="1.5" opacity="0.5">
-                <circle cx="12" cy="8" r="6"/>
-                <path d="M12 14l-4 8 4-2 4 2-4-8z"/>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-light)"
+                stroke-width="1.5" opacity="0.5">
+                <circle cx="12" cy="8" r="6" />
+                <path d="M12 14l-4 8 4-2 4 2-4-8z" />
               </svg>
               <span>Complete your first lesson to earn badges!</span>
             </div>
           </div>
         </div>
-        
+
         <!-- Quick Stats -->
         <div class="dashboard__section">
           <h2 class="section-title">Your Stats</h2>
@@ -245,7 +269,7 @@
           <h1 class="view__title" id="journey-title">Learning Journey</h1>
           <p class="view__subtitle">Follow the structured path to master C programming</p>
         </div>
-        
+
         <!-- Current Unit Info -->
         <div class="journey__unit-info" id="journey-unit-info">
           <span class="journey__unit-label">Current Unit:</span>
@@ -257,7 +281,7 @@
             <span class="progress-bar__text" id="unit-progress-text">0/10 Questions</span>
           </div>
         </div>
-        
+
         <!-- Question Container -->
         <div class="question-container" id="question-container">
           <!-- Question will be rendered here dynamically -->
@@ -275,7 +299,7 @@
           <h1 class="view__title" id="practice-title">Practice Mode</h1>
           <p class="view__subtitle">Choose topics and difficulty to practice</p>
         </div>
-        
+
         <!-- Topic Selection -->
         <div class="practice__filters">
           <div class="filter-group">
@@ -310,7 +334,7 @@
           </div>
           <button class="btn btn--primary" id="start-practice">Start Practice</button>
         </div>
-        
+
         <!-- Practice Question Container -->
         <div class="question-container" id="practice-question-container" hidden>
           <!-- Question will be rendered here dynamically -->
@@ -325,19 +349,19 @@
           <h1 class="view__title" id="progress-title">Your Progress</h1>
           <p class="view__subtitle">Track your learning journey and achievements</p>
         </div>
-        
+
         <!-- Progress Overview -->
         <div class="progress-overview">
           <div class="progress-chart" id="progress-chart">
             <!-- SVG chart will be rendered here -->
           </div>
-          
+
           <!-- Unit Progress Grid -->
           <div class="unit-progress-grid" id="unit-progress-grid">
             <!-- Dynamically populated -->
           </div>
         </div>
-        
+
         <!-- All Badges -->
         <div class="progress__section">
           <h2 class="section-title">All Badges</h2>
@@ -345,24 +369,24 @@
             <!-- Dynamically populated -->
           </div>
         </div>
-        
+
         <!-- Export/Import -->
         <div class="progress__section">
           <h2 class="section-title">Data Management</h2>
           <div class="data-actions">
             <button class="btn btn--secondary" id="export-progress">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                <polyline points="7,10 12,15 17,10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7,10 12,15 17,10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
               Export Progress
             </button>
             <button class="btn btn--secondary" id="import-progress">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                <polyline points="17,8 12,3 7,8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="17,8 12,3 7,8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
               Import Progress
             </button>
@@ -375,21 +399,27 @@
            VIEW: Teacher Mode
            ============================================ -->
       <section class="view" id="view-teacher" aria-labelledby="teacher-title" hidden>
-        <div class="view__header">
-          <h1 class="view__title" id="teacher-title">Teacher Mode</h1>
-          <p class="view__subtitle">Manage questions and view statistics</p>
+        <div class="view__header" style="display: flex; justify-content: space-between; align-items: start;">
+          <div>
+            <h1 class="view__title" id="teacher-title">Teacher Mode</h1>
+            <p class="view__subtitle">Manage questions and view statistics</p>
+          </div>
+          <button class="btn btn--secondary" id="exit-teacher-mode" hidden>
+            Switch to Student Mode
+          </button>
         </div>
-        
+
         <!-- Teacher Login -->
         <div class="teacher-login" id="teacher-login">
           <div class="teacher-login__form">
             <label class="filter-group__label" for="teacher-pin">Enter PIN to access</label>
-            <input type="password" class="text-input" id="teacher-pin" placeholder="Enter PIN" maxlength="6" autocomplete="off">
+            <input type="password" class="text-input" id="teacher-pin" placeholder="Enter PIN" maxlength="6"
+              autocomplete="off">
             <button class="btn btn--primary" id="teacher-login-btn">Access Teacher Mode</button>
             <p class="teacher-login__note">⚠️ Teacher Mode operates locally only. All data stays on this device.</p>
           </div>
         </div>
-        
+
         <!-- Teacher Dashboard (hidden until authenticated) -->
         <div class="teacher-dashboard" id="teacher-dashboard" hidden>
           <!-- Question Editor -->
@@ -401,12 +431,12 @@
               <button class="btn btn--secondary" id="import-questions">Import Questions</button>
               <input type="file" id="import-questions-file" accept=".json,.csv" hidden>
             </div>
-            
+
             <div class="question-list" id="question-list">
               <!-- Dynamically populated -->
             </div>
           </div>
-          
+
           <!-- Stats -->
           <div class="teacher__section">
             <h2 class="section-title">Usage Statistics</h2>
@@ -435,7 +465,7 @@
   <!-- ============================================
        MODALS
        ============================================ -->
-  
+
   <!-- Settings Modal -->
   <div class="modal" id="settings-modal" role="dialog" aria-labelledby="settings-modal-title" aria-modal="true" hidden>
     <div class="modal__backdrop" data-close-modal></div>
@@ -444,8 +474,8 @@
         <h2 class="modal__title" id="settings-modal-title">Settings</h2>
         <button class="btn-icon" data-close-modal aria-label="Close settings">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
       </div>
@@ -455,7 +485,7 @@
           <label class="settings-label" for="settings-name">Your Name</label>
           <input type="text" class="text-input" id="settings-name" placeholder="Enter your name">
         </div>
-        
+
         <!-- Accessibility -->
         <div class="settings-group">
           <label class="settings-label">Accessibility</label>
@@ -468,7 +498,7 @@
             <label for="settings-reduced-motion" class="toggle-label">Reduce Motion</label>
           </div>
         </div>
-        
+
         <!-- Sound -->
         <div class="settings-group">
           <label class="settings-label">Sound</label>
@@ -477,7 +507,7 @@
             <label for="settings-sound" class="toggle-label">Sound Effects</label>
           </div>
         </div>
-        
+
         <!-- Reset -->
         <div class="settings-group">
           <label class="settings-label">Data</label>
@@ -496,8 +526,8 @@
         <h2 class="modal__title" id="hint-modal-title">Hint</h2>
         <button class="btn-icon" data-close-modal aria-label="Close hint">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
       </div>
@@ -513,7 +543,8 @@
   </div>
 
   <!-- Achievement Modal -->
-  <div class="modal modal--achievement" id="achievement-modal" role="dialog" aria-labelledby="achievement-modal-title" aria-modal="true" hidden>
+  <div class="modal modal--achievement" id="achievement-modal" role="dialog" aria-labelledby="achievement-modal-title"
+    aria-modal="true" hidden>
     <div class="modal__backdrop" data-close-modal></div>
     <div class="modal__content modal__content--small">
       <div class="achievement-display">
@@ -538,8 +569,16 @@
        ============================================ -->
   <noscript>
     <style>
-      .app-layout, .header__nav, .header__actions, .footer__actions { display: none !important; }
-      .noscript-content { display: block !important; }
+      .app-layout,
+      .header__nav,
+      .header__actions,
+      .footer__actions {
+        display: none !important;
+      }
+
+      .noscript-content {
+        display: block !important;
+      }
     </style>
     <div class="noscript-content" style="display: none; padding: 2rem; max-width: 800px; margin: 0 auto;">
       <h1>Learn C Programming</h1>
@@ -567,4 +606,5 @@
   <!-- Scripts -->
   <script src="app.js" defer></script>
 </body>
+
 </html>
