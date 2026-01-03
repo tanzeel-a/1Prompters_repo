@@ -603,7 +603,8 @@ button {
   justify-content: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
+  /* Sharp for body buttons */
   font-weight: var(--font-weight-semibold);
   transition: all var(--transition-fast);
   min-height: 44px;
@@ -679,9 +680,11 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  justify-content: center;
   width: 44px;
   height: 44px;
   border-radius: var(--radius-md);
+  /* Keep icons rounded (nav/header mostly) */
   color: var(--color-text-light);
   transition: all var(--transition-fast);
 }
@@ -714,7 +717,8 @@ button {
   width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid var(--color-secondary-dark);
-  border-radius: var(--radius-md);
+  border-radius: 0;
+  /* Sharp inputs */
   background: var(--color-surface);
   color: var(--color-text);
   font-size: var(--font-size-base);
@@ -741,7 +745,8 @@ button {
   padding: var(--spacing-sm) var(--spacing-md);
   padding-right: var(--spacing-xl);
   border: 1px solid var(--color-secondary-dark);
-  border-radius: var(--radius-md);
+  border-radius: 0;
+  /* Sharp select */
   background: var(--color-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237a6b70' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E") no-repeat right 12px center;
   color: var(--color-text);
   font-size: var(--font-size-base);
@@ -819,19 +824,26 @@ button {
 
 /* Cards */
 .card {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  box-shadow: var(--shadow-clay);
+
+  /* Cards */
+  .card {
+    background: var(--color-surface);
+    border-radius: 0;
+    /* Sharp cards */
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-clay);
+  }
 }
 
 .action-card {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+  gap: var(--spacing-md);
   padding: var(--spacing-lg);
   background: var(--color-surface);
-  border-radius: var(--radius-xl);
+  border-radius: 0;
+  /* Sharp action cards */
   box-shadow: var(--shadow-clay);
   transition: all var(--transition-fast);
   text-align: left;
@@ -1040,7 +1052,8 @@ button {
   gap: var(--spacing-md);
   padding: var(--spacing-md);
   background: var(--color-secondary-light);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
+  /* Sharp journey card */
   margin-bottom: var(--spacing-xl);
 }
 
@@ -1079,7 +1092,8 @@ button {
 
 .question-card {
   background: var(--color-surface);
-  border-radius: var(--radius-xl);
+  border-radius: 0;
+  /* Sharp question card */
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-clay);
 }
@@ -1099,7 +1113,8 @@ button {
 .question-card__tag {
   padding: var(--spacing-xs) var(--spacing-sm);
   background: var(--color-secondary);
-  border-radius: var(--radius-full);
+  border-radius: 0;
+  /* Sharp tags */
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-light);
@@ -1153,7 +1168,8 @@ button {
   background: #1e1e1e;
   color: #d4d4d4;
   padding: var(--spacing-md);
-  border-radius: var(--radius-md);
+  border-radius: 0;
+  /* Sharp pre */
   overflow-x: auto;
   font-family: var(--font-mono);
   font-size: var(--font-size-sm);
@@ -1177,7 +1193,8 @@ button {
   padding: var(--spacing-md);
   background: var(--color-surface);
   border: 2px solid var(--color-secondary-dark);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
+  /* Sharp options */
   text-align: left;
   font-size: var(--font-size-base);
   transition: all var(--transition-fast);
@@ -1216,7 +1233,8 @@ button {
   width: 32px;
   height: 32px;
   background: var(--color-secondary);
-  border-radius: var(--radius-md);
+  border-radius: 0;
+  /* Sharp marker */
   font-weight: var(--font-weight-semibold);
   flex-shrink: 0;
 }
@@ -1241,7 +1259,8 @@ button {
   align-items: center;
   padding: var(--spacing-sm) var(--spacing-md);
   background: #2d2d2d;
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  border-radius: 0;
+  /* Sharp editor header */
 }
 
 .code-editor__title {
@@ -1261,7 +1280,8 @@ button {
   background: #1e1e1e;
   color: #d4d4d4;
   border: none;
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  border-radius: 0;
+  /* Sharp textarea */
   font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   line-height: 1.6;
@@ -1276,7 +1296,8 @@ button {
 /* Test Results */
 .test-results {
   background: var(--color-secondary-light);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
+  /* Sharp results */
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }
@@ -1303,7 +1324,8 @@ button {
   gap: var(--spacing-sm);
   padding: var(--spacing-sm);
   background: var(--color-surface);
-  border-radius: var(--radius-md);
+  border-radius: 0;
+  /* Sharp test case */
   margin-bottom: var(--spacing-xs);
   font-family: var(--font-mono);
   font-size: var(--font-size-sm);
@@ -1324,7 +1346,8 @@ button {
 /* Feedback */
 .feedback {
   padding: var(--spacing-md);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
+  /* Sharp feedback */
   margin-bottom: var(--spacing-lg);
 }
 
@@ -1379,7 +1402,8 @@ button {
   align-items: flex-end;
   padding: var(--spacing-lg);
   background: var(--color-surface);
-  border-radius: var(--radius-xl);
+  border-radius: 0;
+  /* Sharp filters */
   box-shadow: var(--shadow-clay);
   margin-bottom: var(--spacing-xl);
 }
@@ -1407,7 +1431,8 @@ button {
 
 .progress-chart {
   background: var(--color-surface);
-  border-radius: var(--radius-xl);
+  border-radius: 0;
+  /* Sharp chart */
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-clay);
   min-height: 300px;
@@ -1422,7 +1447,8 @@ button {
 .unit-progress-card {
   background: var(--color-surface);
   padding: var(--spacing-md);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
+  /* Sharp unit card */
   box-shadow: var(--shadow-md);
 }
 
@@ -1458,7 +1484,8 @@ button {
 .teacher-login__form {
   background: var(--color-surface);
   padding: var(--spacing-xl);
-  border-radius: var(--radius-xl);
+  border-radius: 0;
+  /* Sharp login form */
   box-shadow: var(--shadow-clay);
 }
 
@@ -1501,7 +1528,8 @@ button {
   gap: var(--spacing-md);
   padding: var(--spacing-md);
   background: var(--color-surface);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
+  /* Sharp list item */
   box-shadow: var(--shadow-sm);
 }
 
@@ -1585,7 +1613,8 @@ button {
   max-width: 500px;
   max-height: 90vh;
   background: var(--color-surface);
-  border-radius: var(--radius-xl);
+  border-radius: 0;
+  /* Sharp modal */
   box-shadow: var(--shadow-xl);
   z-index: var(--z-modal);
   overflow: hidden;
@@ -1655,7 +1684,8 @@ button {
 .hint-content {
   padding: var(--spacing-md);
   background: var(--color-secondary-light);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
+  /* Sharp hint */
   margin-bottom: var(--spacing-md);
 }
 
@@ -1682,7 +1712,8 @@ button {
   gap: var(--spacing-sm);
   padding: var(--spacing-md) var(--spacing-lg);
   background: var(--color-surface);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
+  /* Sharp toast */
   box-shadow: var(--shadow-xl);
   animation: toastSlideIn var(--transition-normal);
   max-width: 350px;
