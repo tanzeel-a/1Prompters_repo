@@ -388,8 +388,22 @@ App.UI = {
 
     // Auth Actions
     $('#login-btn')?.addEventListener('click', () => {
+      // Legacy header button support (if safe to keep)
+      if (App.Auth) App.Auth.signInWithGoogle();
+    });
+
+    $('#login-btn-main')?.addEventListener('click', () => {
       if (App.Auth) App.Auth.signInWithGoogle();
       else App.Utils.showToast('Auth not initialized', 'error');
+    });
+
+    $('#teacher-login-link-main')?.addEventListener('click', () => {
+      // Show teacher login modal
+      const modal = $('#teacher-login');
+      if (modal) {
+        modal.hidden = false;
+        // Ensure we are logically in a state where this can be seen
+      }
     });
 
     // Navigation

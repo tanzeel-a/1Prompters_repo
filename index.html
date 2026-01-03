@@ -77,11 +77,7 @@
 
       <!-- Settings & Profile -->
       <div class="header__actions">
-        <button class="btn btn--sm btn--primary" id="login-btn" aria-label="Sign in with Google" style="display: none;">
-          Sign In
-        </button>
-        <button class="btn-icon" id="profile-btn" aria-label="User Profile" aria-expanded="false" title="User Profile"
-          style="display: none;">
+        <button class="btn-icon" id="profile-btn" aria-label="User Profile" aria-expanded="false" title="User Profile">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
             <circle cx="12" cy="7" r="4" />
@@ -174,11 +170,33 @@
 
     <!-- Main Content Area -->
     <main class="main-content" id="main-content" role="main">
+      <!-- ============================================
+         VIEW: Login (Gatekeeper)
+         ============================================ -->
+      <section class="view view--active" id="view-login">
+        <div class="login-container">
+          <div class="login-card clay-card">
+            <div class="login-header">
+              <div class="login-logo">C</div>
+              <h1 class="login-title">C Learning App</h1>
+              <p class="login-subtitle">Master C Programming with fun!</p>
+            </div>
+            <div class="login-actions">
+              <button class="btn btn--primary btn--lg btn--block" id="login-btn-main">
+                <span class="btn__icon">G</span> Sign in with Google
+              </button>
+              <div class="teacher-login-link">
+                <button class="btn-text" id="teacher-login-link-main">Teacher Login</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- ============================================
            VIEW: Dashboard (Home)
            ============================================ -->
-      <section class="view view--active" id="view-dashboard" aria-labelledby="dashboard-title">
+      <section class="view" id="view-dashboard" hidden aria-labelledby="dashboard-title">
         <div class="view__header">
           <h1 class="view__title" id="dashboard-title">Welcome to Learn C!</h1>
           <p class="view__subtitle">Your journey to becoming a C programmer starts here. Let's learn together, step by

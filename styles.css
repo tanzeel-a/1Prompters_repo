@@ -2114,51 +2114,154 @@ body.sidebar-collapsed .footer {
     max-width: 100%;
   }
 }
-/* Auth Buttons */
-#login-btn {
-  background-color: #fff;
-  color: #757575;
-  border: 1px solid #ddd;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-  display: inline-flex;
+
+/* ============================================
+   VIEW-SPECIFIC: LOGIN (GATEKEEPER)
+   ============================================ */
+#view-login {
+  min-height: 100vh;
+  display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-background), var(--color-primary-light));
+  position: relative;
+  z-index: var(--z-modal);
+  /* On top of everything */
+  padding: var(--spacing-md);
 }
 
-#login-btn:hover {
-  background-color: #f7f7f7;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+.login-container {
+  width: 100%;
+  max-width: 480px;
+  perspective: 1000px;
+  animation: float 6s ease-in-out infinite;
 }
 
-#login-btn::before {
-  content: '';
-  width: 18px;
-  height: 18px;
-  background: url('https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg') no-repeat center center;
-  background-size: contain;
+.login-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  text-align: center;
+  box-shadow:
+    8px 8px 32px rgba(232, 164, 184, 0.2),
+    -8px -8px 32px rgba(255, 255, 255, 0.8);
 }
 
-/* Auth Buttons */
-#login-btn {
-  background-color: #fff;
-  color: #757575;
-  border: 1px solid #ddd;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  /* Override default btn styles if needed, but keeping clay style from base class is better */
-  /* Reverting to fit Design System */
+.login-header {
+  margin-bottom: var(--spacing-xl);
 }
 
-#login-btn:hover {
-  background-color: #f7f7f7;
+.login-logo {
+  font-size: 64px;
+  font-weight: 800;
+  color: var(--color-primary-dark);
+  margin-bottom: var(--spacing-sm);
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-inner);
 }
 
-#login-btn::before {
-  content: '';
-  width: 18px;
-  height: 18px;
-  background: url('https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg') no-repeat center center;
-  background-size: contain;
+.login-title {
+  font-size: var(--font-size-2xl);
+  color: var(--color-text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.login-subtitle {
+  color: var(--color-text-light);
+  font-size: var(--font-size-lg);
+}
+
+.login-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.teacher-login-link {
+  margin-top: var(--spacing-md);
+}
+
+/* Hide Sidebar on Login View explicitly */
+body.state-login .sidebar,
+body.state-login .header {
+  display: none;
+}
+
+body.state-login .app-layout {
+  padding-top: 0;
+}
+
+body.state-login .main-content {
+  margin-right: 0;
+  max-width: 100%;
+}
+
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+@media (max-width: 768px) {
+
+  /* Sidebar handling */
+  .sidebar {
+    width: 280px;
+    transform: translateX(100%);
+    /* Start hidden to the right */
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
+    z-index: var(--z-modal);
+    /* Above content */
+    height: 100vh;
+    top: 0;
+  }
+
+  .sidebar.sidebar--open {
+    transform: translateX(0);
+    /* Slide in */
+  }
+
+  /* Overlay backing */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: var(--z-modal-backdrop);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-normal);
+  }
+
+  .sidebar-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Main content adjusts */
+  .main-content {
+    margin-right: 0;
+    max-width: 100%;
+    padding: var(--spacing-md);
+  }
+
+  .footer {
+    margin-right: 0;
+  }
+
+  /* Toggle Button visibility */
+  .menu-toggle {
+    display: inline-flex !important;
+    position: relative;
+    z-index: var(--z-modal + 1);
+    /* Above sidebar */
+  }
 }

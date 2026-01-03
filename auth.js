@@ -72,14 +72,18 @@
     function updateUser(user) {
         currentUser = user || null;
 
-        // Update UI
-        const loginBtn = document.getElementById('login-btn');
-        const profileBtn = document.getElementById('profile-btn');
+        // View Elements
+        const viewLogin = document.getElementById('view-login');
+        const viewDashboard = document.getElementById('view-dashboard');
         const sidebarName = document.getElementById('user-name');
+        const profileBtn = document.getElementById('profile-btn');
 
         if (currentUser) {
-            // Logged In
-            if (loginBtn) loginBtn.style.display = 'none';
+            // LOGGED IN: Show Dashboard
+            if (viewLogin) viewLogin.hidden = true;
+            if (viewDashboard) viewDashboard.hidden = false;
+            document.body.classList.remove('state-login');
+
             if (profileBtn) profileBtn.style.display = 'inline-flex';
 
             // Update Name
@@ -91,11 +95,12 @@
                 App.state.user = currentUser;
             }
         } else {
-            // Logged Out
-            if (loginBtn) loginBtn.style.display = 'inline-flex';
-            if (profileBtn) profileBtn.style.display = 'none'; // Optional: keep profile for local settings? 
-            // User requested login button, so maybe hide profile or keep it for settings? 
-            // Implementing strict toggle for now to show difference.
+            // LOGGED OUT: Show Login (Gatekeeper)
+            if (viewLogin) viewLogin.hidden = false;
+            if (viewDashboard) viewDashboard.hidden = true;
+            document.body.classList.add('state-login');
+
+            if (profileBtn) profileBtn.style.display = 'none';
 
             if (sidebarName) sidebarName.textContent = 'Student';
         }
