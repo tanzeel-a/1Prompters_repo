@@ -8,7 +8,7 @@
     // NOTE: Since this is a static site without a build step (like Vite),
     // we cannot access .env files directly.
     // Please paste your Supabase keys here from your .env file.
-    const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_URL_HERE';
+    const SUPABASE_URL = 'https://mqegebadvrazlizwwzjm.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_CTaxwE8zwyQCe1ao_CiGzQ_2sA-nIaA';
 
     // State
