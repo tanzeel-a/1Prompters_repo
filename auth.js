@@ -31,24 +31,24 @@
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             console.log('Supabase Initialized');
 
-            // Check for returning session (handled by Supabase automatically in localStorage)
-            checkSession();
+            // Set up listener FIRST to catch any initial events
+            supabase.auth.onAuthStateChange((event, session) => {
+                console.log('Auth Event:', event, session?.user?.email);
 
-            // Check for OAuth callback in URL (hash fragment)
-            const hash = window.location.hash;
-            if (hash && hash.includes('access_token')) {
-                console.log('Detected OAuth callback');
-                // Supabase client handles this automatically on init usually,
-                // but let's ensure we update UI once session is established.
-                supabase.auth.onAuthStateChange((event, session) => {
-                    if (event === 'SIGNED_IN') {
-                        // Clear hash to clean URL
-                        window.history.replaceState(null, null, ' ');
-                        updateUser(session?.user);
+                if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+                    updateUser(session?.user);
+                    // Clear hash if it exists (clean URL after OAuth)
+                    if (window.location.hash && window.location.hash.includes('access_token')) {
+                        window.history.replaceState(null, null, window.location.pathname);
                         App.Utils.showToast('Successfully logged in!', 'success');
                     }
-                });
-            }
+                } else if (event === 'SIGNED_OUT') {
+                    updateUser(null);
+                }
+            });
+
+            // Then check existing session (for page reloads)
+            checkSession();
 
         } catch (e) {
             console.error('Error initializing Supabase:', e);
@@ -60,12 +60,6 @@
         if (!supabase) return;
         const { data: { session } } = await supabase.auth.getSession();
         updateUser(session?.user);
-
-        // Listen for auth changes
-        supabase.auth.onAuthStateChange((event, session) => {
-            console.log('Auth event:', event);
-            updateUser(session?.user);
-        });
     }
 
     // Update User State
@@ -115,7 +109,7 @@
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: window.location.href // Return to current page
+                redirectTo: window.location.origin // Ensure we go to the root/home
             }
         });
 
