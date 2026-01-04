@@ -161,4 +161,13 @@ Build a production-quality, responsive, accessible SPA teaching C programming to
   - [x] Add "Sign Out" button to Settings Modal
   - [x] Connect button to `App.Auth.signOut()`
 
+---
+
+## Phase 17: Audio Feedback
+- [x] Implement Global Click Sound
+  - [x] Move sound file to `assets/sounds/`
+  - [x] Create `App.Audio` or utility to handle playback
+  - [x] Add global click listener for buttons
+  - [x] Respect "Sound Effects" setting
+
 

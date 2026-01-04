@@ -490,6 +490,31 @@ App.UI = {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') this.closeAllModals();
     });
+
+    // Global Click Sound
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('button, a.btn, .nav-btn, .option-btn, input[type="checkbox"]');
+      if (target) {
+        this.playClickSound();
+      }
+    });
+  },
+
+  playClickSound() {
+    if (!App.state.settings.sound) return;
+
+    // Create audio context on first user interaction if needed (handling browser policies)
+    if (!this.clickSound) {
+      this.clickSound = new Audio('assets/sounds/click.wav');
+      this.clickSound.volume = 0.5;
+    }
+
+    // Clone node to allow rapid fire playback (overlapping clicks)
+    const sound = this.clickSound.cloneNode();
+    sound.volume = 0.4; // Slightly softer
+    sound.play().catch(e => {
+      // Ignore autoplay errors (usually before first interaction)
+    });
   },
 
   showView(viewId) {
