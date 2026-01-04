@@ -493,7 +493,8 @@ App.UI = {
 
     // Global Click Sound
     document.addEventListener('click', (e) => {
-      const target = e.target.closest('button, a.btn, .nav-btn, .option-btn, input[type="checkbox"]');
+      // User requested specific sounds only: Nav, Auth, Reset
+      const target = e.target.closest('.nav-btn, #login-btn, #login-btn-main, #logout-btn, #reset-progress');
       if (target) {
         this.playClickSound();
       }

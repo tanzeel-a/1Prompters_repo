@@ -167,7 +167,7 @@ Build a production-quality, responsive, accessible SPA teaching C programming to
 - [x] Implement Global Click Sound
   - [x] Move sound file to `assets/sounds/`
   - [x] Create `App.Audio` or utility to handle playback
-  - [x] Add global click listener for buttons
+  - [x] Add global click listener for buttons (Restricted to Nav/Auth/Reset)
   - [x] Respect "Sound Effects" setting
 
 
