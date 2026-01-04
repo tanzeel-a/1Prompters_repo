@@ -1,4 +1,4 @@
-# Learn C - Class 10 UP Board Learning App
+ # Learn C - Class 10 UP Board Learning App
 
 A production-quality, responsive single-page application (SPA) designed to teach C programming to Class 10 UP Board students. Features a soft clay-style UI, SM-2 spaced repetition, and valid C syllabus content.
 

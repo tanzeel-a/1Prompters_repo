@@ -154,4 +154,11 @@ Build a production-quality, responsive, accessible SPA teaching C programming to
 - [x] Feature Cleanup
   - [x] Remove High Contrast Mode (per user request)
 
+---
+
+## Phase 16: Authentication Features
+- [x] Implement Logout
+  - [x] Add "Sign Out" button to Settings Modal
+  - [x] Connect button to `App.Auth.signOut()`
+
 

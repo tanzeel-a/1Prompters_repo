@@ -429,6 +429,12 @@ App.UI = {
     $('[data-action="review-due"]')?.addEventListener('click', () => this.startReview());
 
     // Settings
+    $('#logout-btn')?.addEventListener('click', () => {
+      if (App.Auth) {
+        App.Auth.signOut();
+        this.closeAllModals();
+      }
+    });
     // Note: Profile button triggers settings modal now
     $('#settings-name')?.addEventListener('change', (e) => this.updateSetting('name', e.target.value));
     // High contrast removed
