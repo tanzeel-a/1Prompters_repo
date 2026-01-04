@@ -749,7 +749,8 @@ App.UI = {
           </button>
           <div>
             <button class="btn btn--secondary" id="skip-btn">Skip</button>
-            <button class="btn btn--primary" id="submit-btn">Submit</button>
+            <button class="btn btn--info" id="submit-btn">Submit Question</button>
+            <button class="btn btn--primary" id="next-btn" hidden>Next Question</button>
           </div>
         </div>
       </div>
@@ -834,11 +835,19 @@ App.UI = {
       const grade = isCorrect ? (hintsUsed === 0 ? 5 : 4) : 2;
       await App.SpacedRep.update(question.id, grade);
 
-      // Change Submit button to "Next"
+      // Hide Submit, Show Next
       const subBtn = $('#submit-btn');
-      subBtn.textContent = 'Next Question';
-      subBtn.onclick = () => this.loadNextQuestion();
+      const nextBtn = $('#next-btn');
+
+      subBtn.hidden = true;
+      nextBtn.hidden = false;
+
+      // Auto-focus next for accessibility
+      nextBtn.focus();
     });
+
+    // NEXT Handler
+    $('#next-btn')?.addEventListener('click', () => this.loadNextQuestion());
 
     // SKIP Handler
     $('#skip-btn')?.addEventListener('click', () => this.loadNextQuestion());

@@ -199,4 +199,13 @@ Build a production-quality, responsive, accessible SPA teaching C programming to
   - [x] Verify JS listener logic
   - [x] Check CSS for `.sidebar-collapsed`
 
+---
+
+## Phase 20: Question Flow
+- [x] Fix Journey/Practice Buttons
+  - [x] Add `btn--info` (Blue) to CSS
+  - [x] Separate `Submit` and `Next` buttons in UI
+  - [x] Implement "Submit" -> Save/Grade -> Show "Next" logic
+  - [x] Ensure "Next" is default pink (`btn--primary`)
+
 

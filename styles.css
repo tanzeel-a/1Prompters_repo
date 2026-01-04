@@ -707,6 +707,17 @@ body.sidebar-collapsed .footer {
   color: var(--color-text-inverse);
 }
 
+.btn--info {
+  background: linear-gradient(135deg, var(--color-info), #42a5f5);
+  color: var(--color-text-inverse);
+}
+
+.btn--info:hover {
+  background: linear-gradient(135deg, var(--color-info-light), var(--color-info));
+  color: var(--color-text-dark);
+  /* Ensure contrast */
+}
+
 .btn--ghost {
   background: transparent;
   color: var(--color-text);
