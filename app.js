@@ -1003,12 +1003,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 2. Load Content
   await App.Questions.load();
 
-  // 3. Initialize Auth (if available) - See auth.js
+  // 3. Initialize UI (Binds events, renders lists)
+  App.UI.init();
+
+  // 4. Initialize Auth (if available) - See auth.js
   if (window.App.Auth) {
-    // Auth will handle its own init and then call UI.init()
+    // Auth will handle its own init
     App.Auth.init();
-  } else {
-    // Fallback if no auth module
-    App.UI.init();
   }
 });

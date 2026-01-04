@@ -184,4 +184,14 @@ Build a production-quality, responsive, accessible SPA teaching C programming to
   - [x] Reorganize `app.js` and `auth.js` for clarity
   - [x] Add line-by-line comments for beginners
 
+---
+
+## Phase 19: Socials & Bugfix
+- [x] Fix Event Initialization (Click Bug)
+  - [x] Ensure `App.UI.init()` is always called
+- [x] Footer Socials
+  - [x] Add Icons: GitHub, X (Twitter), LinkedIn
+  - [x] Update Portfolio Link
+  - [x] Remove Android Tool
+
 
