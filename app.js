@@ -453,6 +453,11 @@ App.UI = {
       setTimeout(() => $('#settings-name')?.focus(), 100);
     });
 
+    // Sidebar toggle (Desktop Only)
+    $('#sidebar-toggle')?.addEventListener('click', () => {
+      document.body.classList.toggle('sidebar-collapsed');
+    });
+
     // 5. Practice Mode Controls
     $('#start-practice')?.addEventListener('click', () => this.startPractice());
 

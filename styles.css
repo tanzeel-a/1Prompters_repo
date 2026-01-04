@@ -413,6 +413,31 @@ button {
   z-index: var(--z-dropdown);
 }
 
+/* Sidebar Folded State */
+body.sidebar-collapsed .sidebar {
+  transform: translateX(100%);
+}
+
+body.sidebar-collapsed .main-content,
+body.sidebar-collapsed .footer {
+  margin-right: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+
+  /* Mobile Sidebar Logic */
+  .sidebar {
+    transform: translateX(100%);
+    /* Hidden by default */
+    z-index: var(--z-modal);
+  }
+
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+}
+
 .sidebar__content {
   padding: var(--spacing-lg);
 }

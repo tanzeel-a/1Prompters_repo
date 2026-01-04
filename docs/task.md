@@ -192,6 +192,11 @@ Build a production-quality, responsive, accessible SPA teaching C programming to
 - [x] Footer Socials
   - [x] Add Icons: GitHub, X (Twitter), LinkedIn
   - [x] Update Portfolio Link
+  - [x] Update Portfolio Link
   - [x] Remove Android Tool
+- [x] Fix Sidebar Toggle
+  - [x] Verify HTML element exists
+  - [x] Verify JS listener logic
+  - [x] Check CSS for `.sidebar-collapsed`
 
 
