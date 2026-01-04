@@ -216,4 +216,15 @@ Build a production-quality, responsive, accessible SPA teaching C programming to
   - [x] Ensure Practice buttons trigger correctly
   - [x] Verify Journey buttons still work
 
+---
+
+## Phase 22: Simplify & Enhance
+- [x] Remove Practice Section
+  - [x] Delete "Practice" Nav Button
+  - [x] Delete Practice View HTML
+  - [x] Remove Practice Logic from `app.js`
+- [x] enhancing Progress Section
+  - [x] Add Primitive Cute Bar Graph (SVG)
+  - [x] Style: Rounded edges, Pink theme
+
 

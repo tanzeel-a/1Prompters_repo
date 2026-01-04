@@ -458,10 +458,9 @@ App.UI = {
       document.body.classList.toggle('sidebar-collapsed');
     });
 
-    // 5. Practice Mode Controls
-    $('#start-practice')?.addEventListener('click', () => this.startPractice());
+    // 5. Practice Mode Listeners Removed (Feature Removed)
 
-    // 6. Data Export/Import
+    // 6. Reset Progress
     $('#export-progress')?.addEventListener('click', () => this.exportProgress());
     $('#import-progress')?.addEventListener('click', () => $('#import-file').click());
     $('#import-file')?.addEventListener('change', (e) => this.importProgress(e));
@@ -657,35 +656,22 @@ App.UI = {
     }
   },
 
-  // Load the next question (Context-Aware)
+  // Load the next question (Journey Mode)
   async loadNextQuestion() {
-    // Determine context (Journey or Practice)
-    const isPractice = App.UI.state.currentView === 'practice';
-    const containerId = isPractice ? '#practice-question-container' : '#question-container';
-
-    // Get Next Question based on context
-    let question;
-    if (isPractice) {
-      // In practice, we use the queue
-      question = App.state.practiceQueue.shift();
-    } else {
-      // In journey, we calculate the next one
-      question = App.Questions.getNextInJourney();
-    }
+    const question = App.Questions.getNextInJourney();
 
     if (question) {
       // Found a question? Show it.
       App.state.currentQuestion = question;
-      this.renderQuestion(question, containerId);
+      this.renderQuestion(question, '#question-container');
     } else {
       // No questions left?
-      const container = App.Utils.$(containerId);
+      const container = App.Utils.$('#question-container');
       if (container) {
         container.innerHTML = `
             <div class="question-placeholder">
-              <h3>🎉 Session Complete!</h3>
-              <p>${isPractice ? 'You have finished this practice set.' : "You've completed all questions in the journey!"}</p>
-              ${isPractice ? '<button class="btn btn--primary" onclick="App.UI.showView(\'dashboard\')">Back to Dashboard</button>' : ''}
+              <h3>🎉 Congratulations!</h3>
+              <p>You've completed all questions in the journey!</p>
             </div>
           `;
       }
@@ -947,28 +933,7 @@ App.UI = {
     this.updateProgress(); // Refresh stats UI
   },
 
-  // Start a Practice Session
-  startPractice() {
-    // Get filters
-    const unit = App.Utils.$('#practice-unit')?.value;
-    const difficulty = App.Utils.$('#practice-difficulty')?.value;
-    const type = App.Utils.$('#practice-type')?.value;
 
-    const questions = App.Questions.filter({ unit, difficulty, type });
-
-    if (questions.length === 0) {
-      this.showToast('No questions match your filters', 'info');
-      return;
-    }
-
-    // Shuffle and load
-    App.state.practiceQueue = App.Utils.shuffle(questions);
-    App.state.currentQuestion = App.state.practiceQueue.shift();
-
-    const container = App.Utils.$('#practice-question-container');
-    container.hidden = false;
-    this.renderQuestion(App.state.currentQuestion, '#practice-question-container');
-  },
 
   // Start Spaced Repetition Review
   async startReview() {
@@ -995,8 +960,53 @@ App.UI = {
 
   // Render Stats on Progress Page
   renderProgressDashboard() {
-    // 1. Draw Units Grid
+    // 1. Primitive Cute Bar Graph (Progress per Unit)
+    const chartContainer = App.Utils.$('#progress-chart');
+    if (chartContainer) {
+      // Calculate data
+      const units = App.Questions.getUnits();
+      const data = units.map(u => {
+        const total = App.Questions.getByUnit(u.id).length;
+        const completed = App.Questions.getByUnit(u.id).filter(q => App.state.progress[q.id]?.completed).length;
+        return { label: u.title.split(' ')[0], percent: total ? (completed / total) * 100 : 0 };
+      });
+
+      // SVG Dimensions
+      const width = 300;
+      const height = 150;
+      const barWidth = 40;
+      const gap = 20;
+      const maxBarHeight = 100;
+
+      const barsHTML = data.map((d, i) => {
+        const barHeight = (d.percent / 100) * maxBarHeight;
+        const x = i * (barWidth + gap) + 10;
+        const y = maxBarHeight - barHeight + 20; // +20 for top padding
+
+        return `
+                <g class="bar-group">
+                    <!-- Bar background -->
+                    <rect x="${x}" y="20" width="${barWidth}" height="${maxBarHeight}" rx="10" ry="10" fill="var(--color-secondary)" opacity="0.5" />
+                    <!-- Progress Bar (Pink & Cute) -->
+                    <rect x="${x}" y="${y}" width="${barWidth}" height="${Math.max(barHeight, 10)}" rx="10" ry="10" fill="var(--color-primary)" />
+                    <!-- Label -->
+                    <text x="${x + barWidth / 2}" y="${maxBarHeight + 40}" text-anchor="middle" font-size="12" fill="var(--color-text-light)">${d.label}</text>
+                </g>
+            `;
+      }).join('');
+
+      chartContainer.innerHTML = `
+            <svg width="100%" height="100%" viewBox="0 0 ${width} 160" preserveAspectRatio="xMidYMid meet">
+                ${barsHTML}
+            </svg>
+        `;
+    }
+
+    // 2. Draw Units Grid
     const grid = App.Utils.$('#unit-progress-grid');
+    if (!grid) return;
+
+    // ... rest of grid logic ...
     if (grid) {
       grid.innerHTML = App.state.units.map(unit => {
         const qs = App.Questions.getByUnit(unit.id);

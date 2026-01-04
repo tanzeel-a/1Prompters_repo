@@ -49,14 +49,6 @@
           </svg>
           <span>Home</span>
         </button>
-        <button class="nav-btn" data-view="practice">
-          <svg class="nav-btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
-            <path
-              d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" />
-          </svg>
-          <span>Practice</span>
-        </button>
         <button class="nav-btn" data-view="journey">
           <svg class="nav-btn__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
             stroke-width="2">
@@ -311,52 +303,7 @@
       <!-- ============================================
            VIEW: Practice Mode
            ============================================ -->
-      <section class="view" id="view-practice" aria-labelledby="practice-title" hidden>
-        <div class="view__header">
-          <h1 class="view__title" id="practice-title">Practice Mode</h1>
-          <p class="view__subtitle">Choose topics and difficulty to practice</p>
-        </div>
 
-        <!-- Topic Selection -->
-        <div class="practice__filters">
-          <div class="filter-group">
-            <label class="filter-group__label" for="practice-unit">Select Unit</label>
-            <select class="select-input" id="practice-unit">
-              <option value="all">All Units</option>
-              <!-- Dynamically populated -->
-            </select>
-          </div>
-          <div class="filter-group">
-            <label class="filter-group__label" for="practice-difficulty">Difficulty</label>
-            <select class="select-input" id="practice-difficulty">
-              <option value="all">All Levels</option>
-              <option value="1">Introductory</option>
-              <option value="2">Easy</option>
-              <option value="3">Medium</option>
-              <option value="4">Hard</option>
-              <option value="5">Challenge</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label class="filter-group__label" for="practice-type">Question Type</label>
-            <select class="select-input" id="practice-type">
-              <option value="all">All Types</option>
-              <option value="mcq">Multiple Choice</option>
-              <option value="tf">True/False</option>
-              <option value="fill">Fill in the Blank</option>
-              <option value="output">Code Output</option>
-              <option value="code">Coding Task</option>
-              <option value="debug">Debugging</option>
-            </select>
-          </div>
-          <button class="btn btn--primary" id="start-practice">Start Practice</button>
-        </div>
-
-        <!-- Practice Question Container -->
-        <div class="question-container" id="practice-question-container" hidden>
-          <!-- Question will be rendered here dynamically -->
-        </div>
-      </section>
 
       <!-- ============================================
            VIEW: Progress Dashboard
