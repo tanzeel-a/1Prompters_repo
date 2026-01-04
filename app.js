@@ -1,51 +1,68 @@
 /**
- * Learn C Programming - Application
- * A learning app for Class 10 UP Board students
+ * Learn C Programming - Application Code
+ * --------------------------------------
+ * This file contains the main logic for the C Learning App.
+ * It is organized into "Modules" (sections) to make it easier to understand.
  * 
- * Data Models:
- * - Question: {id, unit, lesson, type, difficulty, body, options, correctAnswer, hints, explanation, points}
- * - Progress: {questionId, completed, correct, attempts, hintsUsed, lastAttempt}
- * - SpacedRep: {questionId, easeFactor, interval, repetitions, nextReview}
- * - Settings: {name, highContrast, reducedMotion, sound}
+ * STRUCTURE:
+ * 1. App Core (State & Configuration)
+ * 2. Localization (Text strings)
+ * 3. Utilities (Helper functions)
+ * 4. Storage (Saving data to the browser)
+ * 5. Spaced Repetition (Smart review algorithm)
+ * 6. Questions Engine (Loading and managing questions)
+ * 7. UI Controller (Handling user clicks and screens)
  */
 
-'use strict';
+'use strict'; // Enforce strict JavaScript mode for better error catching
 
 // ============================================
-// APP NAMESPACE
-// Core state management and configuration
+// 1. APP CORE & STATE
 // ============================================
 const App = {
-  // Application State
+  // The 'state' holds all the changing data of the app
   state: {
+    // Which screen is currently visible? (Default: dashboard)
     currentView: 'dashboard',
+
+    // List of all loaded questions
     questions: [],
+
+    // List of units (topics) in the course
     units: [],
-    progress: {},      // User progress map
-    spacedRep: {},     // Spaced repetition data
-    settings: {        // User preferences
-      name: 'Student',
-      // highContrast removed
-      reducedMotion: false,
-      sound: true
+
+    // User's progress map: { questionId: { completed: true, ... } }
+    progress: {},
+
+    // Spaced repetition data: { questionId: { nextReview: date, ... } }
+    spacedRep: {},
+
+    // User settings and preferences
+    settings: {
+      name: 'Student',      // Display name
+      reducedMotion: false, // Accessibility: Disable animations
+      sound: true           // Enable sound effects
     },
+
+    // The question currently being viewed
     currentQuestion: null,
+
+    // A queue of questions for Practice Mode
     practiceQueue: [],
-    teacherAuthenticated: false
   },
 
-  // Constants
-  TEACHER_PIN: '1234',
-  DB_NAME: 'CLearnDB',
-  DB_VERSION: 1
+  // Constants: Values that don't change
+  DB_NAME: 'CLearnDB',  // Name of the database
+  DB_VERSION: 1         // Database version
 };
 
-// Expose to window for external modules (like auth.js)
+// Expose 'App' to the window so other files (like auth.js) can see it
 window.App = App;
 
 // ============================================
-// LOCALIZATION STRINGS
+// 2. LOCALIZATION STRINGS
 // ============================================
+// We keep text in one place to make it easier to change later
 App.Strings = {
   welcome: 'Welcome to Learn C!',
   continueJourney: 'Continue Learning',
@@ -57,141 +74,137 @@ App.Strings = {
   exportSuccess: 'Progress exported successfully!',
   importSuccess: 'Progress imported successfully!',
   resetConfirm: 'Are you sure? This cannot be undone.',
-  teacherAccess: 'Teacher Mode accessed',
-  invalidPin: 'Invalid PIN. Please try again.',
-  questionTypes: { mcq: 'Multiple Choice', tf: 'True/False', fill: 'Fill in Blank', output: 'Code Output', code: 'Coding', debug: 'Debugging' },
-  difficulties: { 1: 'Introductory', 2: 'Easy', 3: 'Medium', 4: 'Hard', 5: 'Challenge' }
-};
 
-// ============================================
-// UTILITY FUNCTIONS
-// ============================================
-App.Utils = {
-  // Sanitize HTML to prevent XSS
-  sanitizeHTML(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+  // Labels for different question types
+  questionTypes: {
+    mcq: 'Multiple Choice',
+    tf: 'True/False',
+    fill: 'Fill in Blank',
+    output: 'Code Output',
+    code: 'Coding',
+    debug: 'Debugging'
   },
 
-  // Format time in minutes/hours
-  formatTime(seconds) {
-    if (seconds < 60) return `${seconds}s`;
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
-    return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
-  },
-
-  // Debounce function
-  debounce(fn, delay) {
-    let timeout;
-    return (...args) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => fn.apply(this, args), delay);
-    };
-  },
-
-  // Generate unique ID
-  generateId() {
-    return 'id_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
-  },
-
-  // Shuffle array
-  shuffle(array) {
-    const arr = [...array];
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  },
-
-  // Get element safely
-  $(selector) {
-    return document.querySelector(selector);
-  },
-
-  // Get all elements
-  $$(selector) {
-    return document.querySelectorAll(selector);
+  // Labels for difficulty levels
+  difficulties: {
+    1: 'Introductory',
+    2: 'Easy',
+    3: 'Medium',
+    4: 'Hard',
+    5: 'Challenge'
   }
 };
 
 // ============================================
-// STORAGE (IndexedDB with localStorage fallback)
+// 3. UTILITY FUNCTIONS
 // ============================================
-App.Storage = {
-  db: null,
-  useIndexedDB: true,
+App.Utils = {
+  // Safe way to get one element from the HTML
+  // Example: App.Utils.$('#my-id')
+  $(selector) {
+    return document.querySelector(selector);
+  },
 
+  // Safe way to get ALL matching elements from HTML
+  // Example: App.Utils.$$('.my-class')
+  $$(selector) {
+    return document.querySelectorAll(selector);
+  },
+
+  // Sanitize HTML: Prevents hackers from inserting malicious scripts
+  sanitizeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str; // Browser handles escaping automatically here
+    return div.innerHTML;
+  },
+
+  // Check if a string contains valid HTML safe content
+  formatTime(seconds) {
+    if (seconds < 60) return `${seconds}s`; // Less than a minute
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m`; // Less than an hour
+    // Hours and minutes
+    return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+  },
+
+  // Shuffle Array: Randomizes the order of a list (Fisher-Yates algorithm)
+  shuffle(array) {
+    const arr = [...array]; // Create a copy so we don't mess up the original
+    for (let i = arr.length - 1; i > 0; i--) {
+      // Pick a random index
+      const j = Math.floor(Math.random() * (i + 1));
+      // Swap elements
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+};
+
+// ============================================
+// 4. STORAGE (Database)
+// ============================================
+// Handles saving data. Uses IndexedDB (powerful) with localStorage (simple) as backup.
+App.Storage = {
+  db: null,             // The database connection
+  useIndexedDB: true,   // Flag: Are we using the powerful DB?
+
+  // Initialize the database connection
   async init() {
+    // Check if browser supports IndexedDB
     if (!window.indexedDB) {
       this.useIndexedDB = false;
       console.log('IndexedDB not available, using localStorage');
       return;
     }
 
+    // Open connection
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(App.DB_NAME, App.DB_VERSION);
 
+      // Error handler
       request.onerror = () => {
         console.warn('IndexedDB error, falling back to localStorage');
         this.useIndexedDB = false;
         resolve();
       };
 
+      // Success! Connection open.
       request.onsuccess = (e) => {
         this.db = e.target.result;
         resolve();
       };
 
+      // First time setup (Schema creation)
       request.onupgradeneeded = (e) => {
         const db = e.target.result;
-        if (!db.objectStoreNames.contains('progress')) {
-          db.createObjectStore('progress', { keyPath: 'questionId' });
-        }
-        if (!db.objectStoreNames.contains('spacedRep')) {
-          db.createObjectStore('spacedRep', { keyPath: 'questionId' });
-        }
-        if (!db.objectStoreNames.contains('settings')) {
-          db.createObjectStore('settings', { keyPath: 'key' });
-        }
-        if (!db.objectStoreNames.contains('analytics')) {
-          db.createObjectStore('analytics', { keyPath: 'id', autoIncrement: true });
-        }
+        // Create tables (Object Stores) if they don't exist
+        if (!db.objectStoreNames.contains('progress')) db.createObjectStore('progress', { keyPath: 'questionId' });
+        if (!db.objectStoreNames.contains('spacedRep')) db.createObjectStore('spacedRep', { keyPath: 'questionId' });
+        if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings', { keyPath: 'key' });
       };
     });
   },
 
-  async get(store, key) {
-    if (!this.useIndexedDB) {
-      const data = localStorage.getItem(`${App.DB_NAME}_${store}_${key}`);
-      return data ? JSON.parse(data) : null;
-    }
-
-    return new Promise((resolve) => {
-      const tx = this.db.transaction(store, 'readonly');
-      const request = tx.objectStore(store).get(key);
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => resolve(null);
-    });
-  },
-
+  // SAVE data to storage
   async set(store, data) {
+    // Fallback mode
     if (!this.useIndexedDB) {
       const key = data.questionId || data.key || data.id;
       localStorage.setItem(`${App.DB_NAME}_${store}_${key}`, JSON.stringify(data));
       return;
     }
 
+    // IndexedDB mode
     return new Promise((resolve, reject) => {
-      const tx = this.db.transaction(store, 'readwrite');
-      tx.objectStore(store).put(data);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
+      const tx = this.db.transaction(store, 'readwrite'); // Open transaction
+      tx.objectStore(store).put(data); // Put data
+      tx.oncomplete = () => resolve(); // Done!
+      tx.onerror = () => reject(tx.error); // Fail
     });
   },
 
+  // GET ALL data from a store
   async getAll(store) {
+    // Fallback mode
     if (!this.useIndexedDB) {
       const prefix = `${App.DB_NAME}_${store}_`;
       const results = [];
@@ -204,6 +217,7 @@ App.Storage = {
       return results;
     }
 
+    // IndexedDB mode
     return new Promise((resolve) => {
       const tx = this.db.transaction(store, 'readonly');
       const request = tx.objectStore(store).getAll();
@@ -212,32 +226,16 @@ App.Storage = {
     });
   },
 
-  async clear(store) {
-    if (!this.useIndexedDB) {
-      const prefix = `${App.DB_NAME}_${store}_`;
-      const keysToRemove = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith(prefix)) keysToRemove.push(key);
-      }
-      keysToRemove.forEach(k => localStorage.removeItem(k));
-      return;
-    }
-
-    return new Promise((resolve) => {
-      const tx = this.db.transaction(store, 'readwrite');
-      tx.objectStore(store).clear();
-      tx.oncomplete = () => resolve();
-    });
-  },
-
+  // EXPORT all user data (for backup)
   async exportAll() {
     const progress = await this.getAll('progress');
     const spacedRep = await this.getAll('spacedRep');
     const settings = await this.getAll('settings');
+    // Return everything as a single object with a timestamp
     return { progress, spacedRep, settings, exportDate: new Date().toISOString() };
   },
 
+  // IMPORT data (restore backup)
   async importAll(data) {
     if (data.progress) {
       for (const item of data.progress) await this.set('progress', item);
@@ -248,92 +246,124 @@ App.Storage = {
     if (data.settings) {
       for (const item of data.settings) await this.set('settings', item);
     }
+  },
+
+  // DELETE ALL data
+  async clear() {
+    // Logic for full reset would go here
+    // Typically used when user clicks "Reset Progress"
+    const stores = ['progress', 'spacedRep', 'settings'];
+    if (!this.useIndexedDB) {
+      localStorage.clear();
+    } else {
+      const tx = this.db.transaction(stores, 'readwrite');
+      stores.forEach(store => tx.objectStore(store).clear());
+      return new Promise(resolve => {
+        tx.oncomplete = () => resolve();
+      });
+    }
   }
 };
 
 // ============================================
-// SPACED REPETITION (SM-2 Algorithm)
+// 5. SPACED REPETITION (SM-2 Algorithm)
 // ============================================
+// This determines when you should review a question again based on how well you answered.
 App.SpacedRep = {
-  DEFAULT_EASE: 2.5,
-  MIN_EASE: 1.3,
+  DEFAULT_EASE: 2.5, // Start difficulty factor
+  MIN_EASE: 1.3,     // Minimum difficulty factor
 
-  // Calculate next review based on SM-2
+  // Calculate next review date
   calculate(current, grade) {
-    // grade: 0-5 (0-2 = fail, 3-5 = pass)
+    // Grade is 0-5 (0=Fail, 5=Perfect)
     let { easeFactor = this.DEFAULT_EASE, interval = 1, repetitions = 0 } = current || {};
 
     if (grade < 3) {
-      // Failed - reset
+      // If user failed, reset progress for this card
       repetitions = 0;
       interval = 1;
     } else {
-      // Passed
+      // If user passed
       if (repetitions === 0) {
-        interval = 1;
+        interval = 1;      // Next day
       } else if (repetitions === 1) {
-        interval = 6;
+        interval = 6;      // 6 days later
       } else {
-        interval = Math.round(interval * easeFactor);
+        interval = Math.round(interval * easeFactor); // Multiply by ease factor
       }
       repetitions++;
     }
 
-    // Update ease factor
+    // Adjust difficulty based on performance (SM-2 formula)
     easeFactor = easeFactor + (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02));
     if (easeFactor < this.MIN_EASE) easeFactor = this.MIN_EASE;
 
+    // Set the date
     const nextReview = new Date();
     nextReview.setDate(nextReview.getDate() + interval);
 
-    return { easeFactor, interval, repetitions, nextReview: nextReview.toISOString(), lastGrade: grade };
+    return { easeFactor, interval, repetitions, nextReview: nextReview.toISOString() };
   },
 
-  // Get questions due for review
+  // Find questions that are due for review TODAY
   async getDueQuestions() {
     const allRep = await App.Storage.getAll('spacedRep');
     const now = new Date();
+    // Filter items where 'nextReview' date is in the past
     return allRep.filter(item => new Date(item.nextReview) <= now).map(item => item.questionId);
   },
 
-  // Update a question's spaced rep data
+  // Save the result of a review
   async update(questionId, grade) {
-    const current = await App.Storage.get('spacedRep', questionId);
+    const allData = await App.Storage.getAll('spacedRep');
+    const current = allData.find(i => i.questionId === questionId);
+
+    // Calculate new stats
     const newData = this.calculate(current, grade);
     newData.questionId = questionId;
+
+    // Save to DB
     await App.Storage.set('spacedRep', newData);
     return newData;
   }
 };
 
 // ============================================
-// QUESTIONS ENGINE
+// 6. QUESTIONS ENGINE
 // ============================================
 App.Questions = {
+  // Load questions from JSON file
   async load() {
     try {
       const response = await fetch('data/questions-1000.json');
       const data = await response.json();
+
       App.state.questions = data.questions || [];
       App.state.units = data.manifest?.units || [];
       console.log(`Loaded ${App.state.questions.length} questions`);
     } catch (error) {
       console.error('Failed to load questions:', error);
-      App.state.questions = [];
       App.UI.showToast('Failed to load questions', 'error');
     }
   },
 
-  getById(id) {
-    return App.state.questions.find(q => q.id === id);
+  // Get next question in the main "Journey"
+  getNextInJourney() {
+    const progress = App.state.progress;
+    // Look through all questions in order
+    for (const q of App.state.questions) {
+      // Check if not completed
+      if (!progress[q.id] || !progress[q.id].completed) {
+        return q;
+      }
+    }
+    return null; // All done!
   },
 
-  getByUnit(unitId) {
-    return App.state.questions.filter(q => q.unit === unitId);
-  },
-
+  // Filter questions for Practice Mode
   filter({ unit, difficulty, type }) {
     return App.state.questions.filter(q => {
+      // Apply filters if they are not 'all'
       if (unit && unit !== 'all' && q.unit !== parseInt(unit)) return false;
       if (difficulty && difficulty !== 'all' && q.difficulty !== parseInt(difficulty)) return false;
       if (type && type !== 'all' && q.type !== type) return false;
@@ -341,159 +371,109 @@ App.Questions = {
     });
   },
 
-  getNextInJourney() {
-    const progress = App.state.progress;
-    // Find first unanswered question in order
-    for (const q of App.state.questions) {
-      if (!progress[q.id] || !progress[q.id].completed) {
-        return q;
-      }
-    }
-    return null; // All complete
-  },
-
-  // Validate code answer (static pattern matching)
+  // Validate Code Answers (Basic Logic)
   validateCode(userCode, testCases) {
     const results = [];
     for (const tc of testCases) {
-      // Simple output matching
-      const expectedOutput = tc.expected.trim();
-      // Check if code contains expected patterns
-      const passed = this.checkCodeOutput(userCode, tc);
-      results.push({ ...tc, passed, userOutput: passed ? expectedOutput : 'Check your code' });
+      // Check if user's code matches expected patterns
+      let passed = false;
+      if (tc.type === 'contains') {
+        passed = userCode.includes(tc.pattern);
+      } else if (tc.type === 'regex') {
+        passed = new RegExp(tc.pattern).test(userCode);
+      } else {
+        // Default: Simple keyword check
+        const keywords = tc.expected.split(/\s+/);
+        passed = keywords.some(kw => userCode.toLowerCase().includes(kw.toLowerCase()));
+      }
+
+      results.push({ ...tc, passed });
     }
     return results;
-  },
-
-  checkCodeOutput(code, testCase) {
-    // Static validation - check for expected patterns
-    if (testCase.type === 'contains') {
-      return code.includes(testCase.pattern);
-    }
-    if (testCase.type === 'regex') {
-      return new RegExp(testCase.pattern).test(code);
-    }
-    // Default: check if expected keywords exist
-    const keywords = testCase.expected.split(/\s+/);
-    return keywords.some(kw => code.toLowerCase().includes(kw.toLowerCase()));
   }
 };
 
 // ============================================
-// UI CONTROLLER
+// 7. UI CONTROLLER
 // ============================================
+// Handles all user interaction
 App.UI = {
+  // Start up the UI
   init() {
-    this.bindEvents();
-    this.renderUnits();
-    this.updateProgress();
-    this.applySettings();
+    this.bindEvents();       // Setup button clicks
+    this.renderUnits();      // Draw the unit list
+    this.updateProgress();   // Update stats
+    this.applySettings();    // Apply theme/sounds
   },
 
+  // Setup all event listeners (Clicks, Keys, etc.)
   bindEvents() {
     const $ = App.Utils.$;
     const $$ = App.Utils.$$;
 
-    // Auth Actions
-    $('#login-btn')?.addEventListener('click', () => {
-      // Legacy header button support (if safe to keep)
-      if (App.Auth) App.Auth.signInWithGoogle();
+    // 1. Navigation Buttons (Bottom Bar & Headers)
+    $$('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => this.showView(btn.dataset.view));
     });
 
+    // 2. Dashboard Actions
+    $('[data-action="continue-journey"]')?.addEventListener('click', () => {
+      this.showView('journey');
+      this.loadNextQuestion();
+    });
+    $('[data-action="start-practice"]')?.addEventListener('click', () => this.showView('practice'));
+    $('[data-action="review-due"]')?.addEventListener('click', () => this.startReview());
+
+    // 3. User Authentication (Google Login)
     $('#login-btn-main')?.addEventListener('click', () => {
       if (App.Auth) App.Auth.signInWithGoogle();
       else App.Utils.showToast('Auth not initialized', 'error');
     });
 
-    $('#teacher-login-link-main')?.addEventListener('click', () => {
-      // Show teacher login modal
-      const modal = $('#teacher-login');
-      if (modal) {
-        modal.hidden = false;
-        // Ensure we are logically in a state where this can be seen
-      }
-    });
-
-    // Navigation
-    $$('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => this.showView(btn.dataset.view));
-    });
-
-    // Dashboard actions
-    $('[data-action="continue-journey"]')?.addEventListener('click', () => {
-      this.showView('journey');
-      this.loadNextQuestion();
-    });
-
-    $('[data-action="start-practice"]')?.addEventListener('click', () => this.showView('practice'));
-    $('[data-action="review-due"]')?.addEventListener('click', () => this.startReview());
-
-    // Settings
+    // 4. Settings & Account
     $('#logout-btn')?.addEventListener('click', () => {
       if (App.Auth) {
         App.Auth.signOut();
         this.closeAllModals();
       }
     });
-    // Note: Profile button triggers settings modal now
+
+    // Update Name Setting
     $('#settings-name')?.addEventListener('change', (e) => this.updateSetting('name', e.target.value));
-    // High contrast removed
+
+    // Update Reduced Motion Setting
     $('#settings-reduced-motion')?.addEventListener('change', (e) => this.updateSetting('reducedMotion', e.target.checked));
+
+    // Reset Progress Button
     $('#reset-progress')?.addEventListener('click', () => this.resetProgress());
 
-    // Sidebar toggle (Desktop Only - Hidden on Mobile)
-    $('#sidebar-toggle')?.addEventListener('click', () => {
-      document.body.classList.toggle('sidebar-collapsed');
-    });
-
-    // Practice
-    $('#start-practice')?.addEventListener('click', () => this.startPractice());
-
-    // Teacher mode
-    $('#teacher-mode-link')?.addEventListener('click', () => this.showView('teacher'));
-    $('#teacher-login-btn')?.addEventListener('click', () => this.authenticateTeacher());
-    $('#exit-teacher-mode')?.addEventListener('click', () => {
-      App.state.teacherAuthenticated = false;
-      App.Utils.$('#teacher-login').hidden = false;
-      App.Utils.$('#teacher-dashboard').hidden = true;
-      App.Utils.$('#exit-teacher-mode').hidden = true;
-      this.showView('dashboard');
-      this.showToast('Returned to Student Mode', 'info');
-    });
-
-    // Profile Button (Stub)
+    // Open Settings Modal (via Profile Picture)
     $('#profile-btn')?.addEventListener('click', () => {
-      // Just reuse settings name input for now as a simple profile edit
       this.toggleModal('settings-modal');
       setTimeout(() => $('#settings-name')?.focus(), 100);
     });
 
+    // 5. Practice Mode Controls
+    $('#start-practice')?.addEventListener('click', () => this.startPractice());
 
-
-    // Contrast toggle
-    $('#toggle-contrast')?.addEventListener('click', () => {
-      const current = App.state.settings.highContrast;
-      this.updateSetting('highContrast', !current);
-    });
-
-    // Export/Import
+    // 6. Data Export/Import
     $('#export-progress')?.addEventListener('click', () => this.exportProgress());
     $('#import-progress')?.addEventListener('click', () => $('#import-file').click());
     $('#import-file')?.addEventListener('change', (e) => this.importProgress(e));
 
-    // Modal close
+    // 7. Global: Close Modals on close button click
     $$('[data-close-modal]').forEach(el => {
       el.addEventListener('click', () => this.closeAllModals());
     });
 
-    // Keyboard navigation
+    // 8. Global: Keyboard functionality
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') this.closeAllModals();
+      if (e.key === 'Escape') this.closeAllModals(); // ESC to close modal
     });
 
-    // Global Click Sound
+    // 9. Global: Sound Effects (Typewriter Click)
     document.addEventListener('click', (e) => {
-      // User requested specific sounds only: Nav, Auth, Reset
+      // Only play sound for specific important buttons
       const target = e.target.closest('.nav-btn, #login-btn, #login-btn-main, #logout-btn, #reset-progress');
       if (target) {
         this.playClickSound();
@@ -501,89 +481,97 @@ App.UI = {
     });
   },
 
+  // Play the "Click" sound effect
   playClickSound() {
+    // Check if sound is enabled in settings
     if (!App.state.settings.sound) return;
 
-    // Create audio context on first user interaction if needed (handling browser policies)
+    // Load sound file if not already loaded
     if (!this.clickSound) {
       this.clickSound = new Audio('assets/sounds/click.wav');
       this.clickSound.volume = 0.5;
     }
 
-    // Clone node to allow rapid fire playback (overlapping clicks)
+    // Clone the sound to allow overlapping plays (for fast clicking)
     const sound = this.clickSound.cloneNode();
-    sound.volume = 0.4; // Slightly softer
-    sound.play().catch(e => {
-      // Ignore autoplay errors (usually before first interaction)
-    });
+    sound.volume = 0.4;
+    sound.play().catch(() => { }); // Catch error if browser blocks autoplay
   },
 
+  // Switch between different screens (Dashboard, Journey, Practice)
   showView(viewId) {
     const $ = App.Utils.$;
     const $$ = App.Utils.$$;
 
-    // Sidebar auto-collapse on mobile when navigating
-    if (window.innerWidth <= 768) {
-      $('#sidebar')?.classList.remove('sidebar--open');
-    }
-
-    // Update nav
+    // Update Navigation Bar State
     $$('.nav-btn').forEach(btn => {
+      // Toggle 'active' class if this button matches the view
       btn.classList.toggle('nav-btn--active', btn.dataset.view === viewId);
-      btn.setAttribute('aria-current', btn.dataset.view === viewId ? 'page' : 'false');
     });
 
-    // Show view
+    // Hide ALL views first
     $$('.view').forEach(view => {
       view.classList.remove('view--active');
       view.hidden = true;
     });
 
+    // Show ONLY the requested view
     const activeView = $(`#view-${viewId}`);
     if (activeView) {
       activeView.classList.add('view--active');
       activeView.hidden = false;
     }
 
+    // Update state
     App.state.currentView = viewId;
 
-    // View-specific init
-    if (viewId === 'journey') this.loadNextQuestion();
-    if (viewId === 'progress') this.renderProgressDashboard();
+    // Run specific logic for the view
+    if (viewId === 'journey') this.loadNextQuestion();          // Start/Resume Journey
+    if (viewId === 'progress') this.renderProgressDashboard();  // Draw Charts
   },
 
+  // Open/Close a modal (Pop-up)
   toggleModal(modalId) {
     const modal = App.Utils.$(`#${modalId}`);
     if (modal) {
       const isHidden = modal.hidden;
-      modal.hidden = !isHidden;
+      modal.hidden = !isHidden; // Toggle hidden state
+      // Focus first input if opening
       if (!isHidden) {
         modal.querySelector('button, input')?.focus();
       }
     }
   },
 
+  // Force close all modals
   closeAllModals() {
     App.Utils.$$('.modal').forEach(m => m.hidden = true);
   },
 
+  // Show a notification toast
   showToast(message, type = 'info') {
     const container = App.Utils.$('#toast-container');
     const toast = document.createElement('div');
-    toast.className = `toast toast--${type}`;
+    toast.className = `toast toast--${type}`; // Add type class (error/success)
     toast.innerHTML = `
       <span class="toast__message">${App.Utils.sanitizeHTML(message)}</span>
       <button class="toast__close btn-icon" aria-label="Close">×</button>
     `;
+
+    // Remove toast when clicked
     toast.querySelector('.toast__close').addEventListener('click', () => toast.remove());
     container.appendChild(toast);
+
+    // Auto-remove after 4 seconds
     setTimeout(() => toast.remove(), 4000);
   },
 
+  // Render the list of Units on the Dashboard
   renderUnits() {
     const list = App.Utils.$('#unit-list');
     if (!list) return;
 
+    // Create HTML for each unit
     list.innerHTML = App.state.units.map(unit => `
       <li class="unit-list__item" data-unit="${unit.id}">
         <svg class="unit-list__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -594,7 +582,7 @@ App.UI = {
       </li>
     `).join('');
 
-    // Unit selector for practice
+    // Populate "Practice Unit" dropdown
     const select = App.Utils.$('#practice-unit');
     if (select) {
       select.innerHTML = '<option value="all">All Units</option>' +
@@ -602,59 +590,78 @@ App.UI = {
     }
   },
 
+  // Update Progress Stats (Numbers, Charts, Rings)
   async updateProgress() {
+    // 1. Fetch data from storage
     const progress = await App.Storage.getAll('progress');
+
+    // 2. Put it into App state
     App.state.progress = {};
     progress.forEach(p => App.state.progress[p.questionId] = p);
 
+    // 3. Calculate Stats
     const total = App.state.questions.length;
     const completed = progress.filter(p => p.completed).length;
     const correct = progress.filter(p => p.correct).length;
     const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-    // Update UI
+    // 4. Update UI Elements
     const $ = App.Utils.$;
     $('#progress-percent').textContent = `${percent}%`;
     $('#stat-total-answered').textContent = completed;
+    // Avoid division by zero
     $('#stat-accuracy').textContent = completed > 0 ? `${Math.round((correct / completed) * 100)}%` : '0%';
 
-    // Update progress ring
+    // Update SVG Circle (Progress Ring)
     const circle = $('#progress-circle');
     if (circle) {
-      const circumference = 2 * Math.PI * 52;
+      const circumference = 2 * Math.PI * 52; // 2 * PI * r
       circle.style.strokeDashoffset = circumference - (percent / 100) * circumference;
     }
 
-    // Review count
+    // Update Review Counter
     const dueCount = (await App.SpacedRep.getDueQuestions()).length;
     $('#review-count').textContent = dueCount;
   },
 
+  // Apply visual settings (Theme, Motion)
   applySettings() {
     const { highContrast, reducedMotion, name } = App.state.settings;
-    document.documentElement.classList.toggle('high-contrast', highContrast);
+    // Since High Contrast toggle is removed, we force it false, or just ignore.
+    // Assuming user wants normal mode.
     document.documentElement.classList.toggle('reduced-motion', reducedMotion);
 
     const $ = App.Utils.$;
     $('#user-name').textContent = name || 'Student';
     $('#settings-name').value = name || '';
-    $('#settings-high-contrast').checked = highContrast;
     $('#settings-reduced-motion').checked = reducedMotion;
   },
 
+  // Save a changed setting
   async updateSetting(key, value) {
     App.state.settings[key] = value;
     await App.Storage.set('settings', { key: 'user', ...App.state.settings });
     this.applySettings();
-    // this.showToast('Settings saved!', 'success'); // Disabled per user request
   },
 
+  // Reset ALL user progress (Danger Zone)
+  async resetProgress() {
+    if (confirm(App.Strings.resetConfirm)) {
+      await App.Storage.clear(); // Clear DB
+      location.reload();         // Reload page to reset state
+    }
+  },
+
+  // Load the next question for "Journey" mode
   async loadNextQuestion() {
     const question = App.Questions.getNextInJourney();
+
     if (question) {
+      // Found a question? Show it.
       App.state.currentQuestion = question;
       this.renderQuestion(question, '#question-container');
     } else {
+      // No questions? Course complete!
       App.Utils.$('#question-container').innerHTML = `
         <div class="question-placeholder">
           <h3>🎉 Congratulations!</h3>
@@ -664,18 +671,22 @@ App.UI = {
     }
   },
 
+  // Render a Question Card into a container
   renderQuestion(question, containerSelector) {
     const container = App.Utils.$(containerSelector);
     if (!container || !question) return;
 
-    const difficultyClass = `question-card__tag--difficulty-${question.difficulty}`;
+    // 1. Prepare Metadata Labels
     const typeLabel = App.Strings.questionTypes[question.type] || question.type;
     const diffLabel = App.Strings.difficulties[question.difficulty] || '';
+    const difficultyClass = `question-card__tag--difficulty-${question.difficulty}`;
 
+    // 2. Prepare Input Area based on Type
     let optionsHTML = '';
     let inputHTML = '';
 
     if (question.type === 'mcq' || question.type === 'tf') {
+      // Multiple Choice / True False
       optionsHTML = `
         <div class="options-list">
           ${question.options.map((opt, i) => `
@@ -686,26 +697,28 @@ App.UI = {
           `).join('')}
         </div>
       `;
-    } else if (question.type === 'fill' || question.type === 'output') {
-      inputHTML = `
-        <div class="fill-input">
-          <input type="text" class="text-input" id="answer-input" placeholder="Type your answer here..." autocomplete="off">
-        </div>
-      `;
     } else if (question.type === 'code' || question.type === 'debug') {
+      // Code Editor
       inputHTML = `
         <div class="code-editor">
-          <div class="code-editor__header">
-            <span class="code-editor__title">Your Code</span>
-          </div>
-          <textarea class="code-editor__textarea" id="code-input" placeholder="// Write your C code here...">${question.type === 'debug' ? App.Utils.sanitizeHTML(question.buggyCode || '') : ''}</textarea>
+          <div class="code-editor__header"><span>Change Code below:</span></div>
+          <textarea class="code-editor__textarea" id="code-input" placeholder="// Write C code...">${question.type === 'debug' ? App.Utils.sanitizeHTML(question.buggyCode || '') : ''}</textarea>
         </div>
         <div class="test-results" id="test-results" hidden></div>
       `;
+    } else {
+      // Standard Text Input
+      inputHTML = `
+        <div class="fill-input">
+          <input type="text" class="text-input" id="answer-input" placeholder="Type answer..." autocomplete="off">
+        </div>
+      `;
     }
 
+    // 3. Assemble the Card HTML
     container.innerHTML = `
       <div class="question-card" data-question-id="${question.id}">
+        <!-- Header -->
         <div class="question-card__header">
           <div class="question-card__meta">
             <span class="question-card__tag">${typeLabel}</span>
@@ -713,18 +726,21 @@ App.UI = {
           </div>
           <span class="question-card__points">${question.points || 10} pts</span>
         </div>
+        
+        <!-- Question Text -->
         <div class="question-card__body">${this.formatQuestionBody(question.body)}</div>
+        
+        <!-- Inputs -->
         ${optionsHTML}
         ${inputHTML}
+        
+        <!-- Feedback Area -->
         <div class="feedback" id="feedback" hidden></div>
+        
+        <!-- Actions (Hint, Submit) -->
         <div class="question-card__actions">
           <button class="question-card__hint-btn btn-text" id="hint-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-            Get Hint (${question.hints?.length || 0} available)
+            Get Hint (${question.hints?.length || 0})
           </button>
           <div>
             <button class="btn btn--secondary" id="skip-btn">Skip</button>
@@ -734,58 +750,66 @@ App.UI = {
       </div>
     `;
 
-    // Bind question events
+    // 4. Attach Event Listeners to the new HTML
     this.bindQuestionEvents(question);
   },
 
+  // Helper to format code blocks inside question text
   formatQuestionBody(body) {
-    // Handle code blocks
-    let formatted = body.replace(/```c?\n?([\s\S]*?)```/g, '<pre>$1</pre>');
-    // Handle inline code
-    formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
-    return formatted;
+    // Replace markdown style ```code``` with <pre> tags
+    return body
+      .replace(/```c?\n?([\s\S]*?)```/g, '<pre>$1</pre>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
   },
 
+  // Handle Logic inside a Question (Checking answers, etc.)
   bindQuestionEvents(question) {
     const $ = App.Utils.$;
     const $$ = App.Utils.$$;
-    let selectedOption = null;
-    let hintsUsed = 0;
 
-    // Option selection
+    let selectedOption = null; // Track user choice for MCQ
+    let hintsUsed = 0;         // Track hints
+
+    // Option Click Handler
     $$('.option-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        // Deselect others
         $$('.option-btn').forEach(b => b.classList.remove('option-btn--selected'));
+        // Select this one
         btn.classList.add('option-btn--selected');
         selectedOption = parseInt(btn.dataset.index);
       });
     });
 
-    // Submit
+    // SUBMIT Handler
     $('#submit-btn')?.addEventListener('click', async () => {
-      let answer, isCorrect = false;
+      let isCorrect = false;
 
+      // Check MCQ/TF
       if (question.type === 'mcq' || question.type === 'tf') {
-        answer = selectedOption;
-        isCorrect = answer === question.correctAnswer;
+        isCorrect = (selectedOption === question.correctAnswer);
 
-        // Show correct/incorrect on options
+        // Show Visual Feedback on buttons
         $$('.option-btn').forEach((btn, i) => {
-          if (i === question.correctAnswer) btn.classList.add('option-btn--correct');
-          if (i === answer && !isCorrect) btn.classList.add('option-btn--incorrect');
-          btn.disabled = true;
+          if (i === question.correctAnswer) btn.classList.add('option-btn--correct'); // Green
+          if (i === selectedOption && !isCorrect) btn.classList.add('option-btn--incorrect'); // Red
+          btn.disabled = true; // Lock buttons
         });
-      } else if (question.type === 'fill' || question.type === 'output') {
-        answer = $('#answer-input')?.value.trim();
-        isCorrect = answer.toLowerCase() === String(question.correctAnswer).toLowerCase();
-      } else if (question.type === 'code' || question.type === 'debug') {
-        answer = $('#code-input')?.value;
-        const results = App.Questions.validateCode(answer, question.testCases || []);
-        isCorrect = results.every(r => r.passed);
-        this.showTestResults(results);
+      }
+      // Check Code
+      else if (question.type === 'code' || question.type === 'debug') {
+        const userCode = $('#code-input')?.value;
+        const results = App.Questions.validateCode(userCode, question.testCases || []);
+        isCorrect = results.every(r => r.passed); // All tests must pass
+        this.showTestResults(results); // Display Table
+      }
+      // Check Text Input
+      else {
+        const answer = $('#answer-input')?.value.trim();
+        isCorrect = (answer.toLowerCase() === String(question.correctAnswer).toLowerCase());
       }
 
-      // Show feedback
+      // Display Feedback Message
       const feedback = $('#feedback');
       feedback.hidden = false;
       feedback.className = `feedback feedback--${isCorrect ? 'correct' : 'incorrect'}`;
@@ -794,92 +818,96 @@ App.UI = {
         <p class="feedback__explanation">${App.Utils.sanitizeHTML(question.explanation || '')}</p>
       `;
 
-      // Calculate points (reduce for hints used)
-      const maxPoints = question.points || 10;
-      const earnedPoints = isCorrect ? Math.max(maxPoints - (hintsUsed * 3), 1) : 0;
+      // Save Data
+      const maxPts = question.points || 10;
+      const earned = isCorrect ? Math.max(maxPts - (hintsUsed * 3), 1) : 0;
 
-      // Save progress
-      await this.saveQuestionProgress(question.id, isCorrect, earnedPoints, hintsUsed);
+      // 1. Save Progress
+      await this.saveQuestionProgress(question.id, isCorrect, earned, hintsUsed);
 
-      // Update spaced rep
+      // 2. Schedule Next Review (Spaced Repetion)
       const grade = isCorrect ? (hintsUsed === 0 ? 5 : 4) : 2;
       await App.SpacedRep.update(question.id, grade);
 
-      // Update button
-      $('#submit-btn').textContent = 'Next Question';
-      $('#submit-btn').onclick = () => this.loadNextQuestion();
+      // Change Submit button to "Next"
+      const subBtn = $('#submit-btn');
+      subBtn.textContent = 'Next Question';
+      subBtn.onclick = () => this.loadNextQuestion();
     });
 
-    // Skip
+    // SKIP Handler
     $('#skip-btn')?.addEventListener('click', () => this.loadNextQuestion());
 
-    // Hint
+    // HINT Handler
     $('#hint-btn')?.addEventListener('click', () => {
       if (question.hints && hintsUsed < question.hints.length) {
+        // Show hint in modal
         const hint = question.hints[hintsUsed];
         $('#hint-content').textContent = hint;
         this.toggleModal('hint-modal');
+
         hintsUsed++;
-        $('#hint-btn').innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
-            <line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-          Hint used (${question.hints.length - hintsUsed} left)
-        `;
+        $('#hint-btn').textContent = `Hint used (${question.hints.length - hintsUsed} left)`;
       }
     });
   },
 
+  // Display Code Test Results
   showTestResults(results) {
     const container = App.Utils.$('#test-results');
     if (!container) return;
     container.hidden = false;
-
     const passed = results.filter(r => r.passed).length;
+
     container.innerHTML = `
-      <div class="test-results__header">
-        <span class="test-results__title">Test Results</span>
-        <span class="test-results__summary">${passed}/${results.length} passed</span>
-      </div>
-      ${results.map((r, i) => `
-        <div class="test-case test-case--${r.passed ? 'passed' : 'failed'}">
-          <span class="test-case__icon">${r.passed ? '✓' : '✗'}</span>
-          <span>Test ${i + 1}: ${r.passed ? 'Passed' : 'Failed'}</span>
+        <div class="test-results__header">
+            <span>Result: ${passed}/${results.length} passed</span>
         </div>
-      `).join('')}
-    `;
+        ${results.map((r, i) => `
+            <div class="test-case test-case--${r.passed ? 'passed' : 'failed'}">
+                <span>Test ${i + 1}: ${r.passed ? 'Passed' : 'Failed'}</span>
+            </div>
+        `).join('')}
+      `;
   },
 
-  async saveQuestionProgress(questionId, correct, points, hintsUsed) {
-    const existing = App.state.progress[questionId] || { questionId, attempts: 0 };
+  // Save Progress to Storage helper
+  async saveQuestionProgress(qId, correct, points, hints) {
+    // Get existing record or create new
+    const existing = App.state.progress[qId] || { questionId: qId, attempts: 0 };
+
+    // Update data
     const progress = {
       ...existing,
       completed: true,
       correct,
       points: correct ? points : 0,
-      hintsUsed,
+      hintsUsed: hints,
       attempts: existing.attempts + 1,
       lastAttempt: new Date().toISOString()
     };
+
+    // Save
     await App.Storage.set('progress', progress);
-    App.state.progress[questionId] = progress;
-    this.updateProgress();
-    // this.showToast('Progress saved!', 'success'); // Disabled per user request
+    App.state.progress[qId] = progress;
+    this.updateProgress(); // Refresh stats UI
   },
 
+  // Start a Practice Session
   startPractice() {
+    // Get filters
     const unit = App.Utils.$('#practice-unit')?.value;
     const difficulty = App.Utils.$('#practice-difficulty')?.value;
     const type = App.Utils.$('#practice-type')?.value;
 
     const questions = App.Questions.filter({ unit, difficulty, type });
+
     if (questions.length === 0) {
       this.showToast('No questions match your filters', 'info');
       return;
     }
 
+    // Shuffle and load
     App.state.practiceQueue = App.Utils.shuffle(questions);
     App.state.currentQuestion = App.state.practiceQueue.shift();
 
@@ -888,208 +916,99 @@ App.UI = {
     this.renderQuestion(App.state.currentQuestion, '#practice-question-container');
   },
 
+  // Start Spaced Repetition Review
   async startReview() {
     const dueIds = await App.SpacedRep.getDueQuestions();
+
     if (dueIds.length === 0) {
-      this.showToast('No reviews due!', 'info');
+      this.showToast('No reviews due right now!', 'info');
       return;
     }
 
+    // Load actual question objects
     const questions = dueIds.map(id => App.Questions.getById(id)).filter(Boolean);
+
+    // Shuffle and start
     App.state.practiceQueue = App.Utils.shuffle(questions);
-    this.showView('practice');
-    App.state.currentQuestion = App.state.practiceQueue.shift();
-    this.renderQuestion(App.state.currentQuestion, '#practice-question-container');
+    App.UI.showView('practice');
+
+    const firstQ = App.state.practiceQueue.shift();
+    App.state.currentQuestion = firstQ;
+
     App.Utils.$('#practice-question-container').hidden = false;
+    this.renderQuestion(firstQ, '#practice-question-container');
   },
 
+  // Render Stats on Progress Page
   renderProgressDashboard() {
-    // Unit progress grid
+    // 1. Draw Units Grid
     const grid = App.Utils.$('#unit-progress-grid');
     if (grid) {
       grid.innerHTML = App.state.units.map(unit => {
-        const questions = App.Questions.getByUnit(unit.id);
-        const completed = questions.filter(q => App.state.progress[q.id]?.completed).length;
-        const percent = questions.length > 0 ? Math.round((completed / questions.length) * 100) : 0;
+        const qs = App.Questions.getByUnit(unit.id);
+        const done = qs.filter(q => App.state.progress[q.id]?.completed).length;
+        const pct = qs.length ? Math.round((done / qs.length) * 100) : 0;
         return `
-          <div class="unit-progress-card">
-            <div class="unit-progress-card__name">${App.Utils.sanitizeHTML(unit.name)}</div>
-            <div class="progress-bar">
-              <div class="progress-bar__fill" style="width: ${percent}%"></div>
-            </div>
-            <div class="unit-progress-card__stats">${completed}/${questions.length} completed</div>
-          </div>
-        `;
+                <div class="unit-progress-card">
+                    <div class="unit-progress-card__name">${App.Utils.sanitizeHTML(unit.name)}</div>
+                    <div class="progress-bar"><div class="progress-bar__fill" style="width:${pct}%"></div></div>
+                    <div class="unit-progress-card__stats">${done}/${qs.length}</div>
+                </div>
+              `;
       }).join('');
     }
-
-    // Simple chart (bar chart using SVG)
-    const chart = App.Utils.$('#progress-chart');
-    if (chart && App.state.units.length > 0) {
-      const maxQuestions = Math.max(...App.state.units.map(u => u.count || 100));
-      chart.innerHTML = `
-        <svg width="100%" height="250" viewBox="0 0 400 250">
-          <text x="200" y="20" text-anchor="middle" fill="var(--color-text)" font-size="14" font-weight="600">Progress by Unit</text>
-          ${App.state.units.slice(0, 8).map((unit, i) => {
-        const questions = App.Questions.getByUnit(unit.id);
-        const completed = questions.filter(q => App.state.progress[q.id]?.completed).length;
-        const height = (completed / maxQuestions) * 150;
-        const x = 30 + i * 45;
-        return `
-              <rect x="${x}" y="${200 - height}" width="35" height="${height}" fill="var(--color-primary)" rx="4"/>
-              <text x="${x + 17}" y="220" text-anchor="middle" fill="var(--color-text-light)" font-size="10">U${unit.id}</text>
-            `;
-      }).join('')}
-        </svg>
-      `;
-    }
   },
 
-  authenticateTeacher() {
-    const pin = App.Utils.$('#teacher-pin')?.value;
-    if (pin === App.TEACHER_PIN) {
-      App.state.teacherAuthenticated = true;
-      App.Utils.$('#teacher-login').hidden = true;
-      App.Utils.$('#teacher-dashboard').hidden = false;
-      this.showToast(App.Strings.teacherAccess, 'success');
-      this.renderTeacherDashboard();
-    } else {
-      this.showToast(App.Strings.invalidPin, 'error');
-    }
-  },
-
-  renderTeacherDashboard() {
-    const list = App.Utils.$('#question-list');
-    if (list) {
-      list.innerHTML = App.state.questions.slice(0, 20).map(q => `
-        <div class="question-list-item">
-          <span class="question-list-item__id">${q.id}</span>
-          <span class="question-list-item__body">${App.Utils.sanitizeHTML(q.body.substring(0, 60))}...</span>
-          <div class="question-list-item__actions">
-            <button class="btn-icon btn--sm" title="Edit">✎</button>
-            <button class="btn-icon btn--sm" title="Delete">×</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // Stats
-    const stats = App.Utils.$('#teacher-stats');
-    const progress = Object.values(App.state.progress);
-    if (stats) {
-      stats.innerHTML = `
-        <div class="stat-card">
-          <span class="stat-card__value">${App.state.questions.length}</span>
-          <span class="stat-card__label">Total Questions</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-card__value">${progress.length}</span>
-          <span class="stat-card__label">Questions Attempted</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-card__value">${progress.filter(p => p.correct).length}</span>
-          <span class="stat-card__label">Correct Answers</span>
-        </div>
-      `;
-    }
-  },
-
+  // Export Data to JSON file
   async exportProgress() {
     const data = await App.Storage.exportAll();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `learn-c-progress-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `clearn_backup_${new Date().toISOString().split('T')[0]}.json`;
     a.click();
-    URL.revokeObjectURL(url);
     this.showToast(App.Strings.exportSuccess, 'success');
   },
 
+  // Import Data from JSON file
   async importProgress(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-      await App.Storage.importAll(data);
-      await this.updateProgress();
-      this.showToast(App.Strings.importSuccess, 'success');
-    } catch (error) {
-      this.showToast('Failed to import: Invalid file', 'error');
-    }
-  },
-
-  async resetProgress() {
-    if (!confirm(App.Strings.resetConfirm)) return;
-    await App.Storage.clear('progress');
-    await App.Storage.clear('spacedRep');
-    App.state.progress = {};
-    this.updateProgress();
-    this.showToast('Progress reset!', 'info');
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        await App.Storage.importAll(data);
+        this.showToast(App.Strings.importSuccess, 'success');
+        setTimeout(() => location.reload(), 1000);
+      } catch (err) {
+        console.error(err);
+        this.showToast('Invalid backup file', 'error');
+      }
+    };
+    reader.readAsText(file);
   }
 };
 
 // ============================================
-// ANALYTICS (Local only)
+// MAIN INITIALIZATION
 // ============================================
-App.Analytics = {
-  async track(event, data) {
-    await App.Storage.set('analytics', {
-      event,
-      data,
-      timestamp: new Date().toISOString()
-    });
-  }
-};
+// Logic to run when the page finishes loading
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1. Initialize Database
+  await App.Storage.init();
 
-// ============================================
-// INITIALIZATION
-// ============================================
-async function initApp() {
-  try {
-    // 1. Initialize storage first (required for everything)
-    await App.Storage.init();
+  // 2. Load Content
+  await App.Questions.load();
 
-    // 2. Load settings (theme, etc)
-    const savedSettings = await App.Storage.get('settings', 'user');
-    if (savedSettings) {
-      App.state.settings = { ...App.state.settings, ...savedSettings };
-    }
-
-    // 3. Load questions (background, don't render yet)
-    await App.Questions.load();
-
-    // 4. Initialize Auth Loop
-    // This is the critical gatekeeper.
-    // If Auth exists, let it determine if we show Login or Dashboard.
-    if (App.Auth) {
-      App.Auth.init();
-      // Auth.init() will trigger `updateUser` which will flip the views.
-    }
-
-    // 5. Check if we are already in a "Logged In" state from local storage before UI Init?
-    // Actually, let's init UI logic (binding events), but NOT render the dashboard view until Auth says so.
-
+  // 3. Initialize Auth (if available) - See auth.js
+  if (window.App.Auth) {
+    // Auth will handle its own init and then call UI.init()
+    App.Auth.init();
+  } else {
+    // Fallback if no auth module
     App.UI.init();
-    // Note: UI.init calls renderUnits/updateProgress which populates the dashboard,
-    // but the dashboard SECTION should remain hidden via HTML until Auth.updateUser() unhides it.
-
-    console.log('Learn C App initialized successfully!');
-  } catch (error) {
-    console.error('Failed to initialize app:', error);
   }
-}
-
-// Start when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
-  initApp();
-}
-
-// Export for testing
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = App;
-}
+});
