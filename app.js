@@ -657,22 +657,38 @@ App.UI = {
     }
   },
 
-  // Load the next question for "Journey" mode
+  // Load the next question (Context-Aware)
   async loadNextQuestion() {
-    const question = App.Questions.getNextInJourney();
+    // Determine context (Journey or Practice)
+    const isPractice = App.UI.state.currentView === 'practice';
+    const containerId = isPractice ? '#practice-question-container' : '#question-container';
+
+    // Get Next Question based on context
+    let question;
+    if (isPractice) {
+      // In practice, we use the queue
+      question = App.state.practiceQueue.shift();
+    } else {
+      // In journey, we calculate the next one
+      question = App.Questions.getNextInJourney();
+    }
 
     if (question) {
       // Found a question? Show it.
       App.state.currentQuestion = question;
-      this.renderQuestion(question, '#question-container');
+      this.renderQuestion(question, containerId);
     } else {
-      // No questions? Course complete!
-      App.Utils.$('#question-container').innerHTML = `
-        <div class="question-placeholder">
-          <h3>🎉 Congratulations!</h3>
-          <p>You've completed all questions in the journey!</p>
-        </div>
-      `;
+      // No questions left?
+      const container = App.Utils.$(containerId);
+      if (container) {
+        container.innerHTML = `
+            <div class="question-placeholder">
+              <h3>🎉 Session Complete!</h3>
+              <p>${isPractice ? 'You have finished this practice set.' : "You've completed all questions in the journey!"}</p>
+              ${isPractice ? '<button class="btn btn--primary" onclick="App.UI.showView(\'dashboard\')">Back to Dashboard</button>' : ''}
+            </div>
+          `;
+      }
     }
   },
 
@@ -757,7 +773,7 @@ App.UI = {
     `;
 
     // 4. Attach Event Listeners to the new HTML
-    this.bindQuestionEvents(question);
+    this.bindQuestionEvents(question, container);
   },
 
   // Helper to format code blocks inside question text
@@ -769,34 +785,50 @@ App.UI = {
   },
 
   // Handle Logic inside a Question (Checking answers, etc.)
-  bindQuestionEvents(question) {
-    const $ = App.Utils.$;
-    const $$ = App.Utils.$$;
+  bindQuestionEvents(question, container) {
+    // Helper for scoped selection
+    const find = (selector) => container.querySelector(selector);
+    const findAll = (selector) => container.querySelectorAll(selector);
 
     let selectedOption = null; // Track user choice for MCQ
     let hintsUsed = 0;         // Track hints
 
     // Option Click Handler
-    $$('.option-btn').forEach(btn => {
+    findAll('.option-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         // Deselect others
-        $$('.option-btn').forEach(b => b.classList.remove('option-btn--selected'));
+        findAll('.option-btn').forEach(b => b.classList.remove('option-btn--selected'));
         // Select this one
         btn.classList.add('option-btn--selected');
         selectedOption = parseInt(btn.dataset.index);
+
+        // Enable submit button
+        const submitBtn = find('#submit-btn');
+        if (submitBtn) submitBtn.disabled = false;
       });
     });
 
+    // Initial State: Disable submit if MCQ
+    if (question.type === 'mcq' || question.type === 'tf') {
+      const submitBtn = find('#submit-btn');
+      // if (submitBtn) submitBtn.disabled = true; // Optional: Enforce selection first
+    }
+
     // SUBMIT Handler
-    $('#submit-btn')?.addEventListener('click', async () => {
+    find('#submit-btn')?.addEventListener('click', async () => {
       let isCorrect = false;
 
       // Check MCQ/TF
       if (question.type === 'mcq' || question.type === 'tf') {
+        if (selectedOption === null && (question.type === 'mcq' || question.type === 'tf')) {
+          this.showToast('Please select an option!', 'info');
+          return;
+        }
+
         isCorrect = (selectedOption === question.correctAnswer);
 
         // Show Visual Feedback on buttons
-        $$('.option-btn').forEach((btn, i) => {
+        findAll('.option-btn').forEach((btn, i) => {
           if (i === question.correctAnswer) btn.classList.add('option-btn--correct'); // Green
           if (i === selectedOption && !isCorrect) btn.classList.add('option-btn--incorrect'); // Red
           btn.disabled = true; // Lock buttons
@@ -804,25 +836,31 @@ App.UI = {
       }
       // Check Code
       else if (question.type === 'code' || question.type === 'debug') {
-        const userCode = $('#code-input')?.value;
+        const userCode = find('#code-input')?.value;
         const results = App.Questions.validateCode(userCode, question.testCases || []);
         isCorrect = results.every(r => r.passed); // All tests must pass
-        this.showTestResults(results); // Display Table
+        this.showTestResults(results, container); // Display Table
       }
       // Check Text Input
       else {
-        const answer = $('#answer-input')?.value.trim();
+        const answer = find('#answer-input')?.value.trim();
+        if (!answer) {
+          this.showToast('Please type an answer!', 'info');
+          return;
+        }
         isCorrect = (answer.toLowerCase() === String(question.correctAnswer).toLowerCase());
       }
 
       // Display Feedback Message
-      const feedback = $('#feedback');
-      feedback.hidden = false;
-      feedback.className = `feedback feedback--${isCorrect ? 'correct' : 'incorrect'}`;
-      feedback.innerHTML = `
-        <div class="feedback__title">${isCorrect ? '✓ Correct!' : '✗ Not quite right'}</div>
-        <p class="feedback__explanation">${App.Utils.sanitizeHTML(question.explanation || '')}</p>
-      `;
+      const feedback = find('#feedback');
+      if (feedback) {
+        feedback.hidden = false;
+        feedback.className = `feedback feedback--${isCorrect ? 'correct' : 'incorrect'}`;
+        feedback.innerHTML = `
+            <div class="feedback__title">${isCorrect ? '✓ Correct!' : '✗ Not quite right'}</div>
+            <p class="feedback__explanation">${App.Utils.sanitizeHTML(question.explanation || '')}</p>
+          `;
+      }
 
       // Save Data
       const maxPts = question.points || 10;
@@ -836,44 +874,46 @@ App.UI = {
       await App.SpacedRep.update(question.id, grade);
 
       // Hide Submit, Show Next
-      const subBtn = $('#submit-btn');
-      const nextBtn = $('#next-btn');
+      const subBtn = find('#submit-btn');
+      const nextBtn = find('#next-btn');
 
-      subBtn.hidden = true;
-      nextBtn.hidden = false;
-
-      // Auto-focus next for accessibility
-      nextBtn.focus();
+      if (subBtn) subBtn.hidden = true;
+      if (nextBtn) {
+        nextBtn.hidden = false;
+        nextBtn.focus();
+      }
     });
 
     // NEXT Handler
-    $('#next-btn')?.addEventListener('click', () => this.loadNextQuestion());
+    find('#next-btn')?.addEventListener('click', () => this.loadNextQuestion());
 
     // SKIP Handler
-    $('#skip-btn')?.addEventListener('click', () => this.loadNextQuestion());
+    find('#skip-btn')?.addEventListener('click', () => this.loadNextQuestion());
 
     // HINT Handler
-    $('#hint-btn')?.addEventListener('click', () => {
+    find('#hint-btn')?.addEventListener('click', () => {
       if (question.hints && hintsUsed < question.hints.length) {
         // Show hint in modal
         const hint = question.hints[hintsUsed];
-        $('#hint-content').textContent = hint;
+        App.Utils.$('#hint-content').textContent = hint; // Modal IDs are unique globally
         this.toggleModal('hint-modal');
 
         hintsUsed++;
-        $('#hint-btn').textContent = `Hint used (${question.hints.length - hintsUsed} left)`;
+        const hintBtn = find('#hint-btn');
+        if (hintBtn) hintBtn.textContent = `Hint used (${question.hints.length - hintsUsed} left)`;
       }
     });
   },
 
   // Display Code Test Results
-  showTestResults(results) {
-    const container = App.Utils.$('#test-results');
-    if (!container) return;
-    container.hidden = false;
+  showTestResults(results, container) {
+    const outputDiv = container ? container.querySelector('#test-results') : App.Utils.$('#test-results');
+    if (!outputDiv) return;
+
+    outputDiv.hidden = false;
     const passed = results.filter(r => r.passed).length;
 
-    container.innerHTML = `
+    outputDiv.innerHTML = `
         <div class="test-results__header">
             <span>Result: ${passed}/${results.length} passed</span>
         </div>

@@ -208,4 +208,12 @@ Build a production-quality, responsive, accessible SPA teaching C programming to
   - [x] Implement "Submit" -> Save/Grade -> Show "Next" logic
   - [x] Ensure "Next" is default pink (`btn--primary`)
 
+---
+
+## Phase 21: Practice Fix
+- [x] Fix ID Conflicts
+  - [x] Scope selectors in `bindQuestionEvents` to the specific container
+  - [x] Ensure Practice buttons trigger correctly
+  - [x] Verify Journey buttons still work
+
 
